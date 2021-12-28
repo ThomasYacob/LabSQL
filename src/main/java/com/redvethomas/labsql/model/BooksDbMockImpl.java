@@ -30,7 +30,6 @@ public class BooksDbMockImpl implements BooksDbInterface {
     public boolean connect(String database) throws BooksDbException {
         Connection con = null;
         try{
-
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+database+"?UseClientEnc=UTF8");
             System.out.println("Connected!");
         } finally {

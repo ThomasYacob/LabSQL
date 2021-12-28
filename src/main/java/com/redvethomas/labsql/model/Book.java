@@ -31,7 +31,19 @@ public class Book {
     public Book(String isbn, String title, Date published) {
         this(-1, isbn, title, published); 
     }
-    
+
+    public void addAuthor(Author author) {
+        authors.add(author);
+    }
+
+    public boolean removeAuthor(Author author) {
+        return authors.remove(author);
+    }
+
+    public ArrayList<Author> getAuthors() {
+        return (ArrayList<Author>) authors.clone();
+    }
+
     public int getBookId() { return bookId; }
     public String getIsbn() { return isbn; }
     public String getTitle() { return title; }
