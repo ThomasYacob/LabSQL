@@ -3,6 +3,7 @@ package com.redvethomas.labsql.view;
 import java.sql.Date;
 import java.util.List;
 
+import com.redvethomas.labsql.Controller.Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -58,7 +59,7 @@ public class BooksPane extends VBox {
      * @param msg the message
      * @param type types: INFORMATION, WARNING et c.
      */
-    protected void showAlertAndWait(String msg, Alert.AlertType type) {
+    public void showAlertAndWait(String msg, Alert.AlertType type) {
         // types: INFORMATION, WARNING et c.
         Alert alert = new Alert(type, msg);
         alert.showAndWait();

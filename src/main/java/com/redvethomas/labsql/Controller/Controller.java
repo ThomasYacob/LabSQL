@@ -1,8 +1,9 @@
-package com.redvethomas.labsql.view;
+package com.redvethomas.labsql.Controller;
 
 import com.redvethomas.labsql.model.Book;
 import com.redvethomas.labsql.model.BooksDbInterface;
 import com.redvethomas.labsql.model.SearchMode;
+import com.redvethomas.labsql.view.BooksPane;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class Controller {
         this.booksView = booksView;
     }
 
-    protected void onSearchSelected(String searchFor, SearchMode mode) {
+    public void onSearchSelected(String searchFor, SearchMode mode) {
         try {
             if (searchFor != null && searchFor.length() > 1) {
                 List<Book> result = null;
