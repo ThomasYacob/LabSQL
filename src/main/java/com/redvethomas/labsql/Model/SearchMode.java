@@ -1,4 +1,4 @@
-package com.redvethomas.labsql.model;
+package com.redvethomas.labsql.Model;
 
 public enum SearchMode {
     Title, ISBN, Author

@@ -1,9 +1,12 @@
-package com.redvethomas.labsql.view;
+package com.redvethomas.labsql.View;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.List;
 
 import com.redvethomas.labsql.Controller.Controller;
+import com.redvethomas.labsql.Model.BooksDbException;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,9 +18,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import com.redvethomas.labsql.model.Book;
-import com.redvethomas.labsql.model.BooksDbMockImpl;
-import com.redvethomas.labsql.model.SearchMode;
+import com.redvethomas.labsql.Model.Book;
+import com.redvethomas.labsql.Model.BooksDbMockImpl;
+import com.redvethomas.labsql.Model.SearchMode;
 
 
 /**
@@ -35,10 +38,14 @@ public class BooksPane extends VBox {
     private TextField searchField;
     private Button searchButton;
 
+    private Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    BooksDbMockImpl booksDb = new BooksDbMockImpl(); // model
+    private Controller controller;
+
     private MenuBar menuBar;
 
     public BooksPane(BooksDbMockImpl booksDb) {
-        final Controller controller = new Controller(booksDb, this);
+        controller = new Controller(booksDb, this);
         this.init(controller);
     }
 
@@ -52,11 +59,11 @@ public class BooksPane extends VBox {
         booksInTable.clear();
         booksInTable.addAll(books);
     }
-    
+
     /**
      * Notify user on input error or exceptions.
-     * 
-     * @param msg the message
+     *
+     * @param msg  the message
      * @param type types: INFORMATION, WARNING et c.
      */
     public void showAlertAndWait(String msg, Alert.AlertType type) {
@@ -106,9 +113,13 @@ public class BooksPane extends VBox {
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         isbnCol.setCellValueFactory(new PropertyValueFactory<>("isbn"));
         publishedCol.setCellValueFactory(new PropertyValueFactory<>("published"));
-        
+
         // associate the table view with the data
         booksTable.setItems(booksInTable);
+    }
+
+    private void initManage() {
+
     }
 
     private void initSearchView(Controller controller) {
@@ -118,7 +129,7 @@ public class BooksPane extends VBox {
         searchModeBox.getItems().addAll(SearchMode.values());
         searchModeBox.setValue(SearchMode.Title);
         searchButton = new Button("Search");
-        
+
         // event handling (dispatch to controller)
         searchButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -131,6 +142,55 @@ public class BooksPane extends VBox {
     }
 
     private void initMenus() {
+
+        Menu fileMenu = new Menu("File");
+
+        MenuItem exitItem = new MenuItem("Exit");
+        EventHandler<ActionEvent> exitHandler = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Platform.exit();
+            }
+        };
+        exitItem.addEventHandler(ActionEvent.ACTION, exitHandler);
+
+        MenuItem connectItem = new MenuItem("Connect to Db");
+        EventHandler<ActionEvent> connectHandler = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                controller.connectDatabase();
+            }
+        };
+        connectItem.addEventHandler(ActionEvent.ACTION, connectHandler);
+
+        MenuItem disconnectItem = new MenuItem("Disconnect");
+        EventHandler<ActionEvent> disconnectHandler = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                controller.disconnectDatabase();
+            }
+        };
+        disconnectItem.addEventHandler(ActionEvent.ACTION, disconnectHandler);
+
+        fileMenu.getItems().addAll(exitItem, connectItem, disconnectItem);
+
+        Menu searchMenu = new Menu("Search");
+        MenuItem titleItem = new MenuItem("Title");
+        MenuItem isbnItem = new MenuItem("ISBN");
+        MenuItem authorItem = new MenuItem("Author");
+        searchMenu.getItems().addAll(titleItem, isbnItem, authorItem);
+
+        Menu manageMenu = new Menu("Manage");
+        MenuItem addItem = new MenuItem("Add");
+        MenuItem removeItem = new MenuItem("Remove");
+        MenuItem updateItem = new MenuItem("Update");
+        manageMenu.getItems().addAll(addItem, removeItem, updateItem);
+
+        menuBar = new MenuBar();
+        menuBar.getMenus().addAll(fileMenu, searchMenu, manageMenu);
+    }
+}
+/*private void initMenus() {
 
         Menu fileMenu = new Menu("File");
         MenuItem exitItem = new MenuItem("Exit");
@@ -152,5 +212,4 @@ public class BooksPane extends VBox {
 
         menuBar = new MenuBar();
         menuBar.getMenus().addAll(fileMenu, searchMenu, manageMenu);
-    }
-}
+    }*/

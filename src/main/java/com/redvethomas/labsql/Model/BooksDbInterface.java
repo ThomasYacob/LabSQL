@@ -1,6 +1,5 @@
-package com.redvethomas.labsql.model;
+package com.redvethomas.labsql.Model;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -24,12 +23,13 @@ public interface BooksDbInterface {
      * @param database
      * @return true on successful connection.
      */
-    public boolean connect(String database) throws BooksDbException;
-    
+    public boolean connect(String database) throws BooksDbException, SQLException;
     public void disconnect() throws BooksDbException;
     
     public List<Book> searchBooksByTitle(String title) throws BooksDbException;
-    
+    public List<Book> searchBooksByIsbn(String isbn) throws BooksDbException;
+    public List<Book> searchBooksByAuthor(String author) throws BooksDbException;
+
     // TODO: Add abstract methods for all inserts, deletes and queries 
-    // mentioned in the instructions for the assignement.
+    // mentioned in the instructions for the assignment.
 }

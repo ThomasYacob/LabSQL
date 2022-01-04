@@ -1,4 +1,4 @@
-package com.redvethomas.labsql.model;
+package com.redvethomas.labsql.Model;
 
 import java.time.LocalDate;
 

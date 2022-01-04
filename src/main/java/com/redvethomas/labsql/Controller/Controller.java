@@ -1,10 +1,12 @@
 package com.redvethomas.labsql.Controller;
 
-import com.redvethomas.labsql.model.Book;
-import com.redvethomas.labsql.model.BooksDbInterface;
-import com.redvethomas.labsql.model.SearchMode;
-import com.redvethomas.labsql.view.BooksPane;
+import com.redvethomas.labsql.Model.Book;
+import com.redvethomas.labsql.Model.BooksDbException;
+import com.redvethomas.labsql.Model.BooksDbInterface;
+import com.redvethomas.labsql.Model.SearchMode;
+import com.redvethomas.labsql.View.BooksPane;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,31 @@ public class Controller {
         this.booksView = booksView;
     }
 
+    public void connectDatabase() {
+        try {
+            booksDb.connect("Hejsan");
+        } catch (BooksDbException | SQLException e) {
+            e.printStackTrace();
+        };
+    }
+
+    public void disconnectDatabase() {
+        try {
+            booksDb.disconnect();
+        } catch (BooksDbException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    public void addBook(Book book) {
+//        try {
+//            booksDb.addBookToDb(book);
+//        } catch (BooksDbException | SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+
     public void onSearchSelected(String searchFor, SearchMode mode) {
         try {
             if (searchFor != null && searchFor.length() > 1) {
@@ -35,10 +62,10 @@ public class Controller {
                         result = booksDb.searchBooksByTitle(searchFor);
                         break;
                     case ISBN:
-                        // ...
+                        result = booksDb.searchBooksByIsbn(searchFor);
                         break;
                     case Author:
-                        // ...
+                        result = booksDb.searchBooksByAuthor(searchFor);
                         break;
                     default:
                         result= new ArrayList<>();

@@ -1,17 +1,12 @@
 package com.redvethomas.labsql;
 
-import com.redvethomas.labsql.model.Book;
-import com.redvethomas.labsql.model.BooksDbException;
+import com.redvethomas.labsql.Model.BooksDbException;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import com.redvethomas.labsql.model.BooksDbMockImpl;
-import com.redvethomas.labsql.view.BooksPane;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import com.redvethomas.labsql.Model.BooksDbMockImpl;
+import com.redvethomas.labsql.View.BooksPane;
 
 
 public class Main extends Application {
@@ -20,6 +15,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
 
         BooksDbMockImpl booksDb = new BooksDbMockImpl(); // model
+        // Don't forget to connect to the db, somewhere...
+//        primaryStage.set
         BooksPane root = new BooksPane(booksDb);
 
         Scene scene = new Scene(root, 800, 600);
