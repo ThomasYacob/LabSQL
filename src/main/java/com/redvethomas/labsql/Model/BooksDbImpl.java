@@ -36,8 +36,8 @@ public class BooksDbImpl implements BooksDbInterface {
 
         @Override
         public boolean connect(String database) throws BooksDbException, SQLException {;
-            String username = "Thomas";
-            String password = "Thoomas123!";
+            String username = "root";
+            String password = "godzhell1";
             String url = "jdbc:mysql://localhost:3306/" + database + "?UseClientEnc=UTF8";
             try {
 //                Class.forName("com.mysql.cj.jdbc.Driver");
