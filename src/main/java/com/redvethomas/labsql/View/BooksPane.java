@@ -1,11 +1,9 @@
 package com.redvethomas.labsql.View;
 
 import java.sql.Date;
-import java.sql.SQLException;
 import java.util.List;
 
 import com.redvethomas.labsql.Controller.Controller;
-import com.redvethomas.labsql.Model.BooksDbException;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,7 +17,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import com.redvethomas.labsql.Model.Book;
-import com.redvethomas.labsql.Model.BooksDbMockImpl;
+import com.redvethomas.labsql.Model.BooksDbImpl;
 import com.redvethomas.labsql.Model.SearchMode;
 
 
@@ -39,12 +37,14 @@ public class BooksPane extends VBox {
     private Button searchButton;
 
     private Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    BooksDbMockImpl booksDb = new BooksDbMockImpl(); // model
+    BooksDbImpl booksDb = new BooksDbImpl(); // model
     private Controller controller;
+
+    private Book books;
 
     private MenuBar menuBar;
 
-    public BooksPane(BooksDbMockImpl booksDb) {
+    public BooksPane(BooksDbImpl booksDb) {
         controller = new Controller(booksDb, this);
         this.init(controller);
     }
@@ -118,10 +118,6 @@ public class BooksPane extends VBox {
         booksTable.setItems(booksInTable);
     }
 
-    private void initManage() {
-
-    }
-
     private void initSearchView(Controller controller) {
         searchField = new TextField();
         searchField.setPromptText("Search for...");
@@ -181,7 +177,16 @@ public class BooksPane extends VBox {
         searchMenu.getItems().addAll(titleItem, isbnItem, authorItem);
 
         Menu manageMenu = new Menu("Manage");
+
         MenuItem addItem = new MenuItem("Add");
+        EventHandler<ActionEvent> addHandler = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                controller.addBook(books);
+            }
+        };
+        addItem.addEventHandler(ActionEvent.ACTION, addHandler);
+
         MenuItem removeItem = new MenuItem("Remove");
         MenuItem updateItem = new MenuItem("Update");
         manageMenu.getItems().addAll(addItem, removeItem, updateItem);

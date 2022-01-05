@@ -24,5 +24,23 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apiguardian:apiguardian-api:1.1.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-engine:1.8.1" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$USER_HOME$/Downloads/mysql-connector-java-8.0.27/src/build/java" />
+          <root url="file://$USER_HOME$/Downloads/mysql-connector-java-8.0.27/src/demo/java" />
+          <root url="file://$USER_HOME$/Downloads/mysql-connector-java-8.0.27/src/generated/java" />
+          <root url="file://$USER_HOME$/Downloads/mysql-connector-java-8.0.27/src/legacy/java" />
+          <root url="file://$USER_HOME$/Downloads/mysql-connector-java-8.0.27/src/main/core-api/java" />
+          <root url="file://$USER_HOME$/Downloads/mysql-connector-java-8.0.27/src/main/core-impl/java" />
+          <root url="file://$USER_HOME$/Downloads/mysql-connector-java-8.0.27/src/main/protocol-impl/java" />
+          <root url="file://$USER_HOME$/Downloads/mysql-connector-java-8.0.27/src/main/user-api/java" />
+          <root url="file://$USER_HOME$/Downloads/mysql-connector-java-8.0.27/src/main/user-impl/java" />
+          <root url="file://$USER_HOME$/Downloads/mysql-connector-java-8.0.27/src/test/java" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>

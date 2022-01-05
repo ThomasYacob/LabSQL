@@ -5,7 +5,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import com.redvethomas.labsql.Model.BooksDbMockImpl;
+import com.redvethomas.labsql.Model.BooksDbImpl;
 import com.redvethomas.labsql.View.BooksPane;
 
 
@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        BooksDbMockImpl booksDb = new BooksDbMockImpl(); // model
+        BooksDbImpl booksDb = new BooksDbImpl(); // model
         // Don't forget to connect to the db, somewhere...
 //        primaryStage.set
         BooksPane root = new BooksPane(booksDb);

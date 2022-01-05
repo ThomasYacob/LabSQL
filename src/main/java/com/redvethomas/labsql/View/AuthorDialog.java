@@ -1,4 +1,4 @@
 package com.redvethomas.labsql.View;
 
-public class authorDialog {
+public class AuthorDialog {
 }

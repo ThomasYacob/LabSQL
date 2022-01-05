@@ -1,15 +1,18 @@
 package com.redvethomas.labsql.Model;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 public class Author {
 
     private String name;
-    private LocalDate dateOfBirth;
+    private Date dateOfBirth;
+    private String authorId;
 
-    public Author(String name, LocalDate dateOfBirth) {
+    public Author(String name, Date dateOfBirth, String authorId) {
         this.name = name;
         this.dateOfBirth = dateOfBirth;
+        this.authorId = authorId;
     }
 
     public String getName() {
@@ -20,19 +23,26 @@ public class Author {
         this.name = name;
     }
 
-    public LocalDate getDateOfBirth() {
+    public Date getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
+
+    public String getAuthorID() {
+        return authorId;
+    }
+
+
 
     @Override
     public String toString() {
         return "Author{" +
                 "name='" + name + '\'' +
                 ", dateOfBirth=" + dateOfBirth +
+                ", authorId='" + authorId + '\'' +
                 '}';
     }
 }

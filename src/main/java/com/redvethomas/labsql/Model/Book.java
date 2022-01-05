@@ -1,7 +1,7 @@
 package com.redvethomas.labsql.Model;
 
-import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 /**
@@ -16,7 +16,6 @@ public class Book {
         SPECULATIVE_FICTION, SCIENCE_FICTION,
         FANTASY, DYSTOPIAN, MAGICAL_REALISM, REALIST_LITERATURE}
 
-    private int bookId;
     private String isbn; // should check format
     private String title;
     private Date published;
@@ -29,21 +28,16 @@ public class Book {
     // Add authors, as a separate class(!), and corresponding methods, to your implementation
     // as well, i.e. "private ArrayList<Author> authors;"
     
-    public Book(int bookId, String isbn, String title, Date published, Genre genre, int rating) {
+    public Book(String isbn, String title, Genre genre, int rating, String name, String authorId, Date dateOfBirth) {
 //        if(!isValidIsbn(isbn)) {
 //            throw new IllegalArgumentException("Invalid isbn");
 //        }
-        this.bookId = bookId;
         this.isbn = isbn;
         this.title = title;
-        this.published = published;
         this.genre = genre;
         this.rating = rating;
         this.authors = new ArrayList<>();
-    }
-    
-    public Book(String isbn, String title, Date published, Genre genre, int rating) {
-        this(-1, isbn, title, published, genre, rating);
+        authors.add(new Author(name, dateOfBirth, authorId));
     }
 
     private static final Pattern isbnPattern = Pattern.compile("^[- ]?[0-9]{13}$");
@@ -65,7 +59,6 @@ public class Book {
     public Genre getGenre() {
         return genre;
     }
-    public int getBookId() { return bookId; }
     public String getIsbn() { return isbn; }
     public String getTitle() { return title; }
     public Date getPublished() { return published; }
@@ -74,10 +67,14 @@ public class Book {
         return rating;
     }
 
+
     public void setStoryLine(String storyLine) {
         this.storyLine = storyLine;
     }
 
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
 
     @Override
     public String toString() {

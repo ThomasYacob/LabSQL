@@ -30,7 +30,7 @@ public class Controller {
 
     public void connectDatabase() {
         try {
-            booksDb.connect("Hejsan");
+            booksDb.connect("BooksDB");
         } catch (BooksDbException | SQLException e) {
             e.printStackTrace();
         };
@@ -44,18 +44,18 @@ public class Controller {
         }
     }
 
-//    public void addBook(Book book) {
-//        try {
-//            booksDb.addBookToDb(book);
-//        } catch (BooksDbException | SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    public void addBook(Book book) {
+        try {
+            booksDb.addBook(book);
+        } catch (BooksDbException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public void onSearchSelected(String searchFor, SearchMode mode) {
         try {
-            if (searchFor != null && searchFor.length() > 1) {
+            if (searchFor != null && searchFor.length() > 0) {
                 List<Book> result = null;
                 switch (mode) {
                     case Title:
@@ -68,7 +68,7 @@ public class Controller {
                         result = booksDb.searchBooksByAuthor(searchFor);
                         break;
                     default:
-                        result= new ArrayList<>();
+                        result = new ArrayList<>();
                 }
                 if (result == null || result.isEmpty()) {
                     booksView.showAlertAndWait(
