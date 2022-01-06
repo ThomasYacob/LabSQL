@@ -27,6 +27,7 @@ public class BookDialog extends Dialog<Book> {
     private final ComboBox<Book.Genre> genreChoice = new ComboBox(FXCollections
             .observableArrayList(Book.Genre.values()));
     private final TextField ratingField = new TextField();
+    private final DatePicker publishedField = new DatePicker();
     private final TextField authorName = new TextField();
     private final TextField authorId = new TextField();
     private final DatePicker dateOfBirth = new DatePicker();
@@ -82,6 +83,7 @@ public class BookDialog extends Dialog<Book> {
                                 titleField.getText(),
                                 genreChoice.getValue(),
                                 ratingField.getAnchor(),
+                                valueOf(publishedField.getValue()),
                                 authorName.getText(),
                                 authorId.getId(),
                                 valueOf(dateOfBirth.getValue()));

@@ -16,9 +16,9 @@ public class Book {
         SPECULATIVE_FICTION, SCIENCE_FICTION,
         FANTASY, DYSTOPIAN, MAGICAL_REALISM, REALIST_LITERATURE}
 
-    private String isbn; // should check format
+    private final String isbn; // should check format
     private String title;
-    private Date published;
+    private final Date published;
     private String storyLine = "";
     private Genre genre;
     private int rating;
@@ -28,16 +28,17 @@ public class Book {
     // Add authors, as a separate class(!), and corresponding methods, to your implementation
     // as well, i.e. "private ArrayList<Author> authors;"
     
-    public Book(String isbn, String title, Genre genre, int rating, String name, String authorId, Date dateOfBirth) {
-//        if(!isValidIsbn(isbn)) {
-//            throw new IllegalArgumentException("Invalid isbn");
-//        }
+    public Book(String isbn, String title, Genre genre, int rating, Date published, String authorName, String authorId, Date dateOfBirth) {
+        if(!isValidIsbn(isbn)) {
+            throw new IllegalArgumentException("Invalid isbn");
+        }
         this.isbn = isbn;
         this.title = title;
         this.genre = genre;
         this.rating = rating;
+        this.published = published;
         this.authors = new ArrayList<>();
-        authors.add(new Author(name, dateOfBirth, authorId));
+        authors.add(new Author(authorName, dateOfBirth, authorId));
     }
 
     private static final Pattern isbnPattern = Pattern.compile("^[- ]?[0-9]{13}$");
