@@ -34,8 +34,8 @@ public class BooksDbImpl implements BooksDbInterface {
 
         @Override
         public boolean connect(String database) throws BooksDbException, SQLException {;
-            String username = "root";
-            String password = "godzhell1";
+            String username = "Thomas";
+            String password = "Thoomas123!";
             String url = "jdbc:mysql://localhost:3306/" + database + "?UseClientEnc=UTF8";
             try {
                 connection = DriverManager.getConnection(url, username, password);
