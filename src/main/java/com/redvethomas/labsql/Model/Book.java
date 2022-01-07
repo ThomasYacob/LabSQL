@@ -22,6 +22,7 @@ public class Book {
     private String storyLine = "";
     private Genre genre;
     private int rating;
+    private String authorName;
     private ArrayList<Author> authors;
 
     // TODO:
@@ -37,6 +38,7 @@ public class Book {
         this.genre = genre;
         this.rating = rating;
         this.published = published;
+        this.authorName = authorName;
         this.authors = new ArrayList<>();
         authors.add(new Author(authorName, dateOfBirth, authorId));
     }
@@ -67,7 +69,9 @@ public class Book {
     public int getRating() {
         return rating;
     }
-
+    public String getAuthorName() {
+        return authorName;
+    }
 
     public void setStoryLine(String storyLine) {
         this.storyLine = storyLine;

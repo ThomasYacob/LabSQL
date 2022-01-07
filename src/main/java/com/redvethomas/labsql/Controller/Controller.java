@@ -1,9 +1,6 @@
 package com.redvethomas.labsql.Controller;
 
-import com.redvethomas.labsql.Model.Book;
-import com.redvethomas.labsql.Model.BooksDbException;
-import com.redvethomas.labsql.Model.BooksDbInterface;
-import com.redvethomas.labsql.Model.SearchMode;
+import com.redvethomas.labsql.Model.*;
 import com.redvethomas.labsql.View.BooksPane;
 
 import java.sql.SQLException;
@@ -47,11 +44,18 @@ public class Controller {
     public void addBook(Book book) {
         try {
             booksDb.addBook(book);
-        } catch (BooksDbException e) {
+        } catch (BooksDbException | SQLException e) {
             e.printStackTrace();
         }
     }
 
+    public void addAuthor(Author author) {
+        try {
+            booksDb.addAuthor(author);
+        } catch (BooksDbException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void onSearchSelected(String searchFor, SearchMode mode) {
         try {
@@ -67,6 +71,11 @@ public class Controller {
                     case Author:
                         result = booksDb.searchBooksByAuthor(searchFor);
                         break;
+                    case Rating:
+                        result = booksDb.searchBooksByRating(Integer.parseInt(searchFor));
+                        break;
+                    case Genre:
+                        result = booksDb.searchBooksByGenre(searchFor);
                     default:
                         result = new ArrayList<>();
                 }

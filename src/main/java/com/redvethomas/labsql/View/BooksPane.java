@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.List;
 
 import com.redvethomas.labsql.Controller.Controller;
+import com.redvethomas.labsql.Model.Author;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,6 +42,7 @@ public class BooksPane extends VBox {
     private Controller controller;
 
     private Book books;
+    private Author authors;
 
     private MenuBar menuBar;
 
@@ -104,7 +106,10 @@ public class BooksPane extends VBox {
         TableColumn<Book, String> titleCol = new TableColumn<>("Title");
         TableColumn<Book, String> isbnCol = new TableColumn<>("ISBN");
         TableColumn<Book, Date> publishedCol = new TableColumn<>("Published");
-        booksTable.getColumns().addAll(titleCol, isbnCol, publishedCol);
+        TableColumn<Book, String> authorCol = new TableColumn<>("Authors");
+        TableColumn<Book, String> genreCol = new TableColumn<>("Genre");
+        TableColumn<Book, Integer> ratingCol = new TableColumn<>("Rating");
+        booksTable.getColumns().addAll(titleCol, isbnCol, publishedCol, authorCol, genreCol, ratingCol);
         // give title column some extra space
         titleCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.5));
 
@@ -113,6 +118,9 @@ public class BooksPane extends VBox {
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         isbnCol.setCellValueFactory(new PropertyValueFactory<>("isbn"));
         publishedCol.setCellValueFactory(new PropertyValueFactory<>("published"));
+        authorCol.setCellValueFactory(new PropertyValueFactory<>("authorName"));
+        genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
+        ratingCol.setCellValueFactory(new PropertyValueFactory<>("rating"));
 
         // associate the table view with the data
         booksTable.setItems(booksInTable);
@@ -167,7 +175,6 @@ public class BooksPane extends VBox {
             }
         };
         disconnectItem.addEventHandler(ActionEvent.ACTION, disconnectHandler);
-
         fileMenu.getItems().addAll(exitItem, connectItem, disconnectItem);
 
         Menu searchMenu = new Menu("Search");
@@ -177,44 +184,30 @@ public class BooksPane extends VBox {
         searchMenu.getItems().addAll(titleItem, isbnItem, authorItem);
 
         Menu manageMenu = new Menu("Manage");
-
-        MenuItem addItem = new MenuItem("Add");
+        MenuItem addBookItem = new MenuItem("Add Book");
         EventHandler<ActionEvent> addHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 controller.addBook(books);
             }
         };
-        addItem.addEventHandler(ActionEvent.ACTION, addHandler);
+        addBookItem.addEventHandler(ActionEvent.ACTION, addHandler);
+
+        MenuItem addAuthorItem = new MenuItem("Add author");
+        EventHandler<ActionEvent> addAuthorHandler = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                controller.addAuthor(authors);
+            }
+        };
+        addAuthorItem.addEventHandler(ActionEvent.ACTION, addAuthorHandler);
+
 
         MenuItem removeItem = new MenuItem("Remove");
         MenuItem updateItem = new MenuItem("Update");
-        manageMenu.getItems().addAll(addItem, removeItem, updateItem);
+        manageMenu.getItems().addAll(addBookItem, addAuthorItem, removeItem, updateItem);
 
         menuBar = new MenuBar();
         menuBar.getMenus().addAll(fileMenu, searchMenu, manageMenu);
     }
 }
-/*private void initMenus() {
-
-        Menu fileMenu = new Menu("File");
-        MenuItem exitItem = new MenuItem("Exit");
-        MenuItem connectItem = new MenuItem("Connect to Db");
-        MenuItem disconnectItem = new MenuItem("Disconnect");
-        fileMenu.getItems().addAll(exitItem, connectItem, disconnectItem);
-
-        Menu searchMenu = new Menu("Search");
-        MenuItem titleItem = new MenuItem("Title");
-        MenuItem isbnItem = new MenuItem("ISBN");
-        MenuItem authorItem = new MenuItem("Author");
-        searchMenu.getItems().addAll(titleItem, isbnItem, authorItem);
-
-        Menu manageMenu = new Menu("Manage");
-        MenuItem addItem = new MenuItem("Add");
-        MenuItem removeItem = new MenuItem("Remove");
-        MenuItem updateItem = new MenuItem("Update");
-        manageMenu.getItems().addAll(addItem, removeItem, updateItem);
-
-        menuBar = new MenuBar();
-        menuBar.getMenus().addAll(fileMenu, searchMenu, manageMenu);
-    }*/

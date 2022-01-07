@@ -5,14 +5,9 @@
  */
 package com.redvethomas.labsql.Model;
 
-import com.redvethomas.labsql.View.BookDialog;
-
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A mock implementation of the BooksDBInterface interface to demonstrate how to
@@ -34,8 +29,8 @@ public class BooksDbImpl implements BooksDbInterface {
 
         @Override
         public boolean connect(String database) throws BooksDbException, SQLException {;
-            String username = "Thomas";
-            String password = "Thoomas123!";
+            String username = "root";
+            String password = "godzhell1";
             String url = "jdbc:mysql://localhost:3306/" + database + "?UseClientEnc=UTF8";
             try {
                 connection = DriverManager.getConnection(url, username, password);
@@ -64,7 +59,46 @@ public class BooksDbImpl implements BooksDbInterface {
     }
 
     @Override
-    public void addBook(Book book) throws BooksDbException {
+    public void addBook(Book book) throws BooksDbException, SQLException {
+        PreparedStatement statement = null;
+        try {
+            connection.setAutoCommit(false);
+            String query = "INSERT INTO Book(Book.isbn, Book.title, BooksDB.Genre.genre, " +
+                    "BooksDB.Rating.rating, published, BooksDB.Author.Name)" +
+                    "VALUES(?, ?, ?, ?, ?, ?)";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, book.getIsbn());
+            statement.setString(2, book.getTitle());
+            statement.setString(3, book.getGenre().toString());
+            statement.setString(4, Integer.toString(book.getRating()));
+            statement.setDate(5, (Date) book.getPublished());
+            statement.setString(6, book.getAuthorName());
+            statement.executeUpdate();
+            int i = 0;
+            for(Author author : book.getAuthors()) {
+                query = "INSERT INTO Author(name, dateofbirth, authorid) VALUES(?,?,?)";
+                statement = connection.prepareStatement(query);
+                statement.setString(1, book.getAuthors().get(i).getAuthorID());
+                statement.setString(2, book.getIsbn());
+                statement.executeUpdate();
+                i++;
+            }
+            connection.commit();
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+                statement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void addAuthor(Author author) throws BooksDbException {
 
     }
 
@@ -78,36 +112,32 @@ public class BooksDbImpl implements BooksDbInterface {
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
-                    "join Author on (BookAuthor.authorId = Author.authorId)" +
-                     "WHERE title LIKE '%"+searchTitle+"%'";
-
+                    "join Author ON (BookAuthor.authorId = Author.authorId)" +
+                    "WHERE title LIKE '%" + searchTitle + "%'";
             statement = connection.prepareStatement(query);
             rs = statement.executeQuery();
-            while(rs.next()) {
-                String isbn = rs.getString("ISBN");
-                String title = rs.getString("Title");
-                String genre = rs.getString("Genre");
-                int rating = rs.getInt("Rating");
-                Date published = rs.getDate("Published");
-                String authorName = rs.getString("Name");
-                String authorId = rs.getString("AuthorID");
-                Date dateOfBirth = rs.getDate("dateOfBirth");
-                Book book = new Book(isbn, title, Book.Genre.valueOf(genre),
-                        rating, published, authorName, authorId, dateOfBirth);
+            while (rs.next()) {
+                Book book = new Book(
+                        rs.getString("ISBN"),
+                        rs.getString("Title"),
+                        Book.Genre.valueOf(rs.getString("Genre")),
+                        rs.getInt("Rating"), rs.getDate("Published"),
+                        rs.getString("Name"), rs.getString("AuthorID"),
+                        rs.getDate("dateOfBirth"));
                 result.add(book);
             }
             return result;
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             try {
                 throw e;
-            } catch(SQLException ex) {
+            } catch (SQLException ex) {
                 ex.printStackTrace();
             }
         } finally {
             try {
                 statement.close();
-                rs.close();;
-            } catch(SQLException e) {
+                rs.close();
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
@@ -124,68 +154,18 @@ public class BooksDbImpl implements BooksDbInterface {
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
-                    "join Author on (BookAuthor.authorId = Author.authorId)" +
-                    "WHERE title LIKE '%"+searchIsbn+"%'";
-
-            statement = connection.prepareStatement(query);
-            rs = statement.executeQuery();
-            while(rs.next()) {
-                String isbn = rs.getString("ISBN");
-                String title = rs.getString("Title");
-                String genre = rs.getString("Genre");
-                int rating = rs.getInt("Rating");
-                Date published = rs.getDate("Published");
-                String authorName = rs.getString("Name");
-                String authorId = rs.getString("AuthorID");
-                Date dateOfBirth = rs.getDate("dateOfBirth");
-                Book book = new Book(isbn, title, Book.Genre.valueOf(genre),
-                        rating, published, authorName, authorId, dateOfBirth);
-                result.add(book);
-            }
-            return result;
-        } catch(SQLException e) {
-            try {
-                throw e;
-            } catch(SQLException ex) {
-                ex.printStackTrace();
-            }
-        } finally {
-            try {
-                statement.close();
-                rs.close();;
-            } catch(SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
-        }
-
-    @Override
-    public List<Book> searchBooksByAuthor(String searchAuthor) throws BooksDbException {
-        List<Book> result = new ArrayList<>();
-        ResultSet rs = null;
-        PreparedStatement statement = null;
-        try {
-            String query = "SELECT * FROM Book " +
-                    "join Genre ON (Book.isbn = Genre.isbn)" +
-                    "join Rating ON (Book.isbn = Rating.isbn)" +
-                    "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
-                    "join Author on (BookAuthor.authorId = Author.authorId)" +
-                    "WHERE title LIKE '%" + searchAuthor + "%'";
-
+                    "join Author ON (BookAuthor.authorId = Author.authorId)" +
+                    "WHERE Book.isbn LIKE '%" + searchIsbn + "%'";
             statement = connection.prepareStatement(query);
             rs = statement.executeQuery();
             while (rs.next()) {
-                String isbn = rs.getString("ISBN");
-                String title = rs.getString("Title");
-                String genre = rs.getString("Genre");
-                int rating = rs.getInt("Rating");
-                Date published = rs.getDate("Published");
-                String authorName = rs.getString("Name");
-                String authorId = rs.getString("AuthorID");
-                Date dateOfBirth = rs.getDate("dateOfBirth");
-                Book book = new Book(isbn, title, Book.Genre.valueOf(genre),
-                        rating, published, authorName, authorId, dateOfBirth);
+                Book book = new Book(
+                        rs.getString("ISBN"),
+                        rs.getString("Title"),
+                        Book.Genre.valueOf(rs.getString("Genre")),
+                        rs.getInt("Rating"), rs.getDate("Published"),
+                        rs.getString("Name"), rs.getString("AuthorID"),
+                        rs.getDate("dateOfBirth"));
                 result.add(book);
             }
             return result;
@@ -199,7 +179,133 @@ public class BooksDbImpl implements BooksDbInterface {
             try {
                 statement.close();
                 rs.close();
-                ;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Book> searchBooksByAuthor(String searchAuthor) throws BooksDbException {
+        List<Book> result = new ArrayList<>();
+        ResultSet rs = null;
+        PreparedStatement statement = null;
+        try {
+            String query = "SELECT * FROM Author " +
+                    "JOIN BookAuthor ON (Author.authorId = BookAuthor.authorId)" +
+                    "JOIN Book ON (BookAuthor.isbn = Book.isbn)" +
+                    "join Genre ON (Book.isbn = Genre.isbn)" +
+                    "join Rating ON (Book.isbn = Rating.isbn)" +
+                    "WHERE Author.Name LIKE '%" + searchAuthor + "%'";
+            statement = connection.prepareStatement(query);
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                Book book = new Book(
+                        rs.getString("ISBN"),
+                        rs.getString("Title"),
+                        Book.Genre.valueOf(rs.getString("Genre")),
+                        rs.getInt("Rating"), rs.getDate("Published"),
+                        rs.getString("Name"), rs.getString("AuthorID"),
+                        rs.getDate("dateOfBirth"));
+                result.add(book);
+            }
+            return result;
+        } catch (SQLException e) {
+            try {
+                throw e;
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                statement.close();
+                rs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Book> searchBooksByRating(int searchRating) throws BooksDbException {
+        List<Book> result = new ArrayList<>();
+        ResultSet rs = null;
+        PreparedStatement statement = null;
+        try {
+            String query = "SELECT * FROM Book " +
+                    "join Genre ON (Book.isbn = Genre.isbn)" +
+                    "join Rating ON (Book.isbn = Rating.isbn)" +
+                    "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
+                    "join Author ON (BookAuthor.authorId = Author.authorId)" +
+                    "WHERE Rating.rating LIKE '%" + searchRating + "%'";
+            statement = connection.prepareStatement(query);
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                Book book = new Book(
+                        rs.getString("ISBN"),
+                        rs.getString("Title"),
+                        Book.Genre.valueOf(rs.getString("Genre")),
+                        rs.getInt("Rating"), rs.getDate("Published"),
+                        rs.getString("Name"), rs.getString("AuthorID"),
+                        rs.getDate("dateOfBirth"));
+                result.add(book);
+            }
+            return result;
+        } catch (SQLException e) {
+            try {
+                throw e;
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                statement.close();
+                rs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Book> searchBooksByGenre(String searchGenre) throws BooksDbException {
+        List<Book> result = new ArrayList<>();
+        ResultSet rs = null;
+        PreparedStatement statement = null;
+        try {
+            String query = "SELECT * FROM Book " +
+                    "join Genre ON (Book.isbn = Genre.isbn)" +
+                    "join Rating ON (Book.isbn = Rating.isbn)" +
+                    "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
+                    "join Author ON (BookAuthor.authorId = Author.authorId)" +
+                    "WHERE genre LIKE '%" + searchGenre + "%'";
+            statement = connection.prepareStatement(query);
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                Book book = new Book(
+                        rs.getString("ISBN"),
+                        rs.getString("Title"),
+                        Book.Genre.valueOf(rs.getString("Genre")),
+                        rs.getInt("Rating"), rs.getDate("Published"),
+                        rs.getString("Name"), rs.getString("AuthorID"),
+                        rs.getDate("dateOfBirth"));
+                result.add(book);
+                System.out.println(Book.Genre.valueOf(rs.getString("Genre")));
+            }
+            return result;
+        } catch (SQLException e) {
+            try {
+                throw e;
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                statement.close();
+                rs.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
