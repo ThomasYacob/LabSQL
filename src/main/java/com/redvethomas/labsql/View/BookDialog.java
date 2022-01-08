@@ -28,9 +28,9 @@ public class BookDialog extends Dialog<Book> {
             .observableArrayList(Book.Genre.values()));
     private final TextField ratingField = new TextField();
     private final DatePicker publishedField = new DatePicker();
-    private final TextField authorName = new TextField();
-    private final TextField authorId = new TextField();
-    private final DatePicker dateOfBirth = new DatePicker();
+    private final TextField authorNameField = new TextField();
+    private final TextField authorIdField = new TextField();
+    private final DatePicker dateOfBirthField = new DatePicker();
 
 
     public BookDialog() {
@@ -57,6 +57,12 @@ public class BookDialog extends Dialog<Book> {
         grid.add(genreChoice, 2, 4);
         grid.add(new Label("Rating "), 1, 5);
         grid.add(ratingField, 2, 5);
+        grid.add(new Label("Author Name"), 1, 6);
+        grid.add(authorNameField, 2, 6);
+        grid.add(new Label("Date of Birth"), 1, 7);
+        grid.add(dateOfBirthField, 2, 7);
+        grid.add(new Label("AuthorID"), 1, 8);
+        grid.add(authorIdField, 2, 8);
 
 
         this.getDialogPane().setContent(grid);
@@ -75,6 +81,7 @@ public class BookDialog extends Dialog<Book> {
         this.setResultConverter(new Callback<ButtonType, Book>() {
             @Override
             public Book call(ButtonType b) {
+                int tmp;
                 Book result = null;
                 if (b == buttonTypeOk) {
                     if (isValidData()) {
@@ -82,14 +89,14 @@ public class BookDialog extends Dialog<Book> {
                                 isbnField.getText(),
                                 titleField.getText(),
                                 genreChoice.getValue(),
-                                ratingField.getAnchor(),
+                                Integer.parseInt(ratingField.getText()),
                                 valueOf(publishedField.getValue()),
-                                authorName.getText(),
-                                authorId.getId(),
-                                valueOf(dateOfBirth.getValue()));
+                                authorNameField.getText(),
+                                authorIdField.getText(),
+                                valueOf(dateOfBirthField.getValue()));
+                        System.out.println(result.toString());
                     }
                 }
-
                 clearFormData();
                 return result;
             }

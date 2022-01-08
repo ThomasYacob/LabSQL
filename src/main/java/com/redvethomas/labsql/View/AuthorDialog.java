@@ -23,7 +23,7 @@ import static java.sql.Date.valueOf;
 public class AuthorDialog extends Dialog<Author>{
 
     private final TextField authorNameField = new TextField();
-    private final DatePicker dateOfBirth = new DatePicker();
+    private final DatePicker dateOfBirthField = new DatePicker();
     private final TextField authorIDField = new TextField();
     private final TextField ISBNField = new TextField();
 
@@ -41,12 +41,14 @@ public class AuthorDialog extends Dialog<Author>{
         grid.setHgap(5);
         grid.setVgap(5);
         grid.setPadding(new Insets(10, 10, 10, 10));
-        grid.add(new Label("AuthorID "), 1, 1);
-        grid.add(authorIDField, 2, 1);
-        grid.add(new Label("Name "), 1, 2);
-        grid.add(authorNameField, 2, 2);
-        grid.add(new Label("ISBN"), 1, 3);
-        grid.add(ISBNField, 2, 3);
+        grid.add(new Label("Author name "), 1, 1);
+        grid.add(authorNameField, 2, 1);
+        grid.add(new Label("Date of birth"), 1, 2);
+        grid.add(dateOfBirthField, 2, 2);
+        grid.add(new Label("AuthorID "), 1, 3);
+        grid.add(authorIDField, 2, 3);
+        grid.add(new Label("ISBN"), 1, 4);
+        grid.add(ISBNField, 2, 4);
 
 
         this.getDialogPane().setContent(grid);
@@ -70,9 +72,10 @@ public class AuthorDialog extends Dialog<Author>{
                     if (isValidData()) {
                         result = new Author(
                                 authorNameField.getText(),
-                                valueOf(dateOfBirth.getValue()),
-                                authorIDField.getText());
-//                                ISBNField.getText());
+                                valueOf(dateOfBirthField.getValue()),
+                                authorIDField.getText() + ISBNField.getText());
+//                                ISBNField.getText();
+                        System.out.println(result.toString());
                     }
                 }
 

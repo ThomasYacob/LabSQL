@@ -20,6 +20,7 @@ import java.util.List;
 public class BooksDbImpl implements BooksDbInterface {
 
     private final List<Book> books;
+
     private Connection connection;
 
     public BooksDbImpl() {
@@ -66,25 +67,33 @@ public class BooksDbImpl implements BooksDbInterface {
         PreparedStatement statement = null;
         try {
             connection.setAutoCommit(false);
-//            statement = connection.prepareStatement("INSERT INTO Book(Book.isbn, Book.title, BooksDB.Genre.genre, " +
-//                    "BooksDB.Rating.rating, published, BooksDB.Author.Name)" +
-//                    "VALUES(?, ?, ?, ?, ?, ?)");
+
             statement = connection.prepareStatement("INSERT INTO Book(isbn, title, published) VALUES(?, ?, ?)");
             statement.setString(1, book.getIsbn());
             statement.setString(2, book.getTitle());
-//            statement.setString(3, book.getGenre().toString());
-//            statement.setString(4, Integer.toString(book.getRating()));
             statement.setDate(3, Date.valueOf(String.valueOf(book.getPublished())));
-//            statement.setString(6, book.getAuthorName());
             statement.executeUpdate();
-//                        int i = 0;
-//                        for(Author author : book.getAuthors()) {
-//                            statement = connection.prepareStatement("INSERT INTO BookAuthor VALUES(?, ?)");
-//                            statement.setString(1, book.getAuthors().get(i).getAuthorID());
-//                            statement.setString(2, book.getIsbn());
-//                            statement.executeUpdate();
-//                            i++;
-//                        }
+
+            statement = connection.prepareStatement("INSERT INTO Genre VALUES(?, ?)");
+            statement.setString(1, book.getGenre().toString());
+            statement.setString(2, book.getIsbn());
+            statement.executeUpdate();
+
+            statement = connection.prepareStatement("INSERT INTO Rating VALUES(?, ?)");
+            statement.setString(1, Integer.toString(book.getRating()));
+            statement.setString(2, book.getIsbn());
+            statement.executeUpdate();
+
+            statement = connection.prepareStatement("INSERT INTO Author VALUES(?, ?, ?)");
+            statement.setString(1, book.getAuthorName());
+            statement.setDate(2, Date.valueOf(String.valueOf(book.getAuthors().get(0).getDateOfBirth())));
+            statement.setString(3, book.getAuthors().get(0).getAuthorID());
+            statement.executeUpdate();
+
+            statement = connection.prepareStatement("INSERT INTO BookAuthor VALUES(?, ?)");
+            statement.setString(1, book.getAuthors().get(0).getAuthorID());
+            statement.setString(2, book.getIsbn());
+            statement.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -107,6 +116,13 @@ public class BooksDbImpl implements BooksDbInterface {
         PreparedStatement statement = null;
         try {
             connection.setAutoCommit(false);
+
+//            statement = connection.prepareStatement("INSERT INTO Book(isbn, title, published) VALUES (?, ?, ?)");
+//            statement.setString(1, book.getIsbn());
+//            statement.setString(2, book.getTitle());
+//            statement.setDate(3, Date.valueOf(String.valueOf(book.getPublished())));
+//            statement.executeUpdate();
+
             statement = connection.prepareStatement("INSERT INTO Author(Name, dateOfBirth, authorId) VALUES(?, ?, ?)");
             statement.setString(1, author.getName());
             statement.setString(2, String.valueOf(author.getDateOfBirth()));
@@ -137,12 +153,6 @@ public class BooksDbImpl implements BooksDbInterface {
         PreparedStatement statement = null;
         ResultSet rs = null;
         try {
-//            String sql = "SELECT * FROM Book " +
-//                    "join Genre ON (Book.isbn = Genre.isbn)" +
-//                    "join Rating ON (Book.isbn = Rating.isbn)" +
-//                    "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
-//                    "join Author ON (BookAuthor.authorId = Author.authorId)" +
-//                    "WHERE title LIKE '%" + searchTitle + "%'";
             statement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +

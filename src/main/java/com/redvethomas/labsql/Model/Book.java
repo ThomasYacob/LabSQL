@@ -83,6 +83,7 @@ public class Book {
 
     @Override
     public String toString() {
-        return title + ", " + isbn + ", " + published.toString();
+        return isbn + " " + title + ", " + genre + ", " + getRating() + " " + published.toString()
+                + " " + getAuthors();
     }
 }

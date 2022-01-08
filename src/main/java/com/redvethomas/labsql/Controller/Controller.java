@@ -51,7 +51,12 @@ public class Controller {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    booksView.showAlertAndWait("1", ERROR);
+                                    try {
+                                        throw new BooksDbException("1", e);
+                                    } catch (BooksDbException e) {
+                                        e.printStackTrace();
+                                    }
+                                    booksView.showAlertAndWait("2", ERROR);
                                 }
                             }
                     );
@@ -79,7 +84,7 @@ public class Controller {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    booksView.showAlertAndWait("", ERROR);
+                                    booksView.showAlertAndWait("1", ERROR);
                                 }
                             }
                     );
