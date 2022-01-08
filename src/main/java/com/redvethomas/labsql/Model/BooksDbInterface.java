@@ -26,7 +26,7 @@ public interface BooksDbInterface {
     public boolean connect(String database) throws BooksDbException;
     public void disconnect() throws BooksDbException;
     public void addBook(Book book) throws BooksDbException, SQLException;
-    public void addAuthor(Author author) throws BooksDbException, SQLException;
+    public void addAuthor(Author author, String isbn) throws BooksDbException, SQLException;
 
     public List<Book> searchBooksByTitle(String searchTitle) throws BooksDbException;
     public List<Book> searchBooksByIsbn(String searchISBN) throws BooksDbException;

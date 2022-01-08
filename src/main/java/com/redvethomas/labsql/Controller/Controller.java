@@ -78,7 +78,7 @@ public class Controller {
         new Thread() {
             public void run() {
                 try {
-                    booksDb.addAuthor(author);
+                    booksDb.addAuthor(author, Isbn);
                 } catch (BooksDbException | SQLException e) {
                     javafx.application.Platform.runLater(
                             new Runnable() {

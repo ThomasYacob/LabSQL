@@ -178,11 +178,11 @@ public class BooksPane extends VBox {
         disconnectItem.addEventHandler(ActionEvent.ACTION, disconnectHandler);
         fileMenu.getItems().addAll(exitItem, connectItem, disconnectItem);
 
-        Menu searchMenu = new Menu("Search");
-        MenuItem titleItem = new MenuItem("Title");
-        MenuItem isbnItem = new MenuItem("ISBN");
-        MenuItem authorItem = new MenuItem("Author");
-        searchMenu.getItems().addAll(titleItem, isbnItem, authorItem);
+//        Menu searchMenu = new Menu("Search");
+//        MenuItem titleItem = new MenuItem("Title");
+//        MenuItem isbnItem = new MenuItem("ISBN");
+//        MenuItem authorItem = new MenuItem("Author");
+//        searchMenu.getItems().addAll(titleItem, isbnItem, authorItem);
 
         Menu manageMenu = new Menu("Manage");
         MenuItem addBookItem = new MenuItem("Add Book");
@@ -214,6 +214,6 @@ public class BooksPane extends VBox {
         manageMenu.getItems().addAll(addBookItem, addAuthorItem, removeItem, updateItem);
 
         menuBar = new MenuBar();
-        menuBar.getMenus().addAll(fileMenu, searchMenu, manageMenu);
+        menuBar.getMenus().addAll(fileMenu, manageMenu);
     }
 }

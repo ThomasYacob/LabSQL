@@ -117,12 +117,6 @@ public class BooksDbImpl implements BooksDbInterface {
         try {
             connection.setAutoCommit(false);
 
-//            statement = connection.prepareStatement("INSERT INTO Book(isbn, title, published) VALUES (?, ?, ?)");
-//            statement.setString(1, book.getIsbn());
-//            statement.setString(2, book.getTitle());
-//            statement.setDate(3, Date.valueOf(String.valueOf(book.getPublished())));
-//            statement.executeUpdate();
-
             statement = connection.prepareStatement("INSERT INTO Author(Name, dateOfBirth, authorId) VALUES(?, ?, ?)");
             statement.setString(1, author.getName());
             statement.setString(2, String.valueOf(author.getDateOfBirth()));
