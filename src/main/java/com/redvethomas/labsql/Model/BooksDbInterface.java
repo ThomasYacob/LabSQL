@@ -28,7 +28,7 @@ public interface BooksDbInterface {
     public void addBook(Book book) throws BooksDbException, SQLException;
     public void addAuthor(Author author) throws BooksDbException, SQLException;
 
-    public List<Book> searchBooksByTitle(String searchTitle) throws BooksDbException, SQLException;
+    public List<Book> searchBooksByTitle(String searchTitle) throws BooksDbException;
     public List<Book> searchBooksByIsbn(String searchISBN) throws BooksDbException;
     public List<Book> searchBooksByAuthor(String searchAuthor) throws BooksDbException;
     public List<Book> searchBooksByRating(int searchRating) throws BooksDbException;
