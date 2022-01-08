@@ -43,6 +43,7 @@ public class BooksPane extends VBox {
     private Author authors;
 
     private BookDialog bookDialog = new BookDialog();
+    private IsbnDialog isbnDialog = new IsbnDialog();
     private AuthorDialog authorDialog = new AuthorDialog();
 
     private MenuBar menuBar;
@@ -201,9 +202,11 @@ public class BooksPane extends VBox {
         EventHandler<ActionEvent> addAuthorHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                Optional<String> resultIsbn = isbnDialog.showAndWait();
+                String Isbn = resultIsbn.get();
                 Optional<Author> result = authorDialog.showAndWait();
                 Author author = result.get();
-                controller.addAuthor(author);
+                controller.addAuthor(author,Isbn);
             }
         };
         addAuthorItem.addEventHandler(ActionEvent.ACTION, addAuthorHandler);

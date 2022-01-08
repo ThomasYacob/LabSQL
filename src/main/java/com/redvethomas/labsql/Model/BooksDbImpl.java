@@ -109,7 +109,7 @@ public class BooksDbImpl implements BooksDbInterface {
     }
 
     @Override
-    public void addAuthor(Author author) throws BooksDbException, SQLException {
+    public void addAuthor(Author author, String Isbn) throws BooksDbException, SQLException {
         if(author == null) {
             throw new BooksDbException("");
         }
@@ -125,7 +125,7 @@ public class BooksDbImpl implements BooksDbInterface {
 
             statement = connection.prepareStatement("INSERT INTO BookAuthor(authorId, isbn) VALUES(?, ?)");
             statement.setString(1, author.getAuthorID());
-            statement.setString(2, books.get(1).getIsbn());
+            statement.setString(2, Isbn);
             statement.executeUpdate();
             connection.commit();
         } catch (SQLException e) {

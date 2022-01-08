@@ -74,7 +74,7 @@ public class Controller {
         }.start();
     }
 
-    public void addAuthor(Author author) {
+    public void addAuthor(Author author, String Isbn) {
         new Thread() {
             public void run() {
                 try {
