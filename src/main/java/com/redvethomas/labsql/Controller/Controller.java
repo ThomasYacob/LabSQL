@@ -28,7 +28,7 @@ public class Controller {
     public void connectDatabase() {
         try {
             booksDb.connect("BooksDB");
-        } catch (BooksDbException | SQLException e) {
+        } catch (BooksDbException e) {
             e.printStackTrace();
         };
     }
@@ -42,19 +42,50 @@ public class Controller {
     }
 
     public void addBook(Book book) {
-        try {
-            booksDb.addBook(book);
-        } catch (BooksDbException | SQLException e) {
-            e.printStackTrace();
-        }
+        new Thread() {
+            public void run() {
+                try {
+                    booksDb.addBook(book);
+                } catch (BooksDbException | SQLException e) {
+                    javafx.application.Platform.runLater(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    booksView.showAlertAndWait("1", ERROR);
+                                }
+                            }
+                    );
+//                } catch (SQLException e) {
+//                    javafx.application.Platform.runLater(
+//                            new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    booksView.showAlertAndWait("2", ERROR);
+//                                }
+//                            }
+//                    );
+                }
+            }
+        }.start();
     }
 
     public void addAuthor(Author author) {
-        try {
-            booksDb.addAuthor(author);
-        } catch (BooksDbException e) {
-            e.printStackTrace();
-        }
+        new Thread() {
+            public void run() {
+                try {
+                    booksDb.addAuthor(author);
+                } catch (BooksDbException | SQLException e) {
+                    javafx.application.Platform.runLater(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    booksView.showAlertAndWait("", ERROR);
+                                }
+                            }
+                    );
+                }
+            }
+        }.start();
     }
 
     public void onSearchSelected(String searchFor, SearchMode mode) {
@@ -63,28 +94,109 @@ public class Controller {
                 List<Book> result = null;
                 switch (mode) {
                     case Title:
-                        result = booksDb.searchBooksByTitle(searchFor);
+                        new Thread() {
+                            public void run() {
+                                try {
+                                    List<Book> result = booksDb.searchBooksByTitle(searchFor);
+                                    javafx.application.Platform.runLater(
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    booksView.displayBooks(result);
+
+                                                }
+                                            }
+                                    );
+                                } catch (BooksDbException e) {
+                                    booksView.showAlertAndWait("", ERROR);
+                                }
+                            }
+                        }.start();
                         break;
                     case ISBN:
-                        result = booksDb.searchBooksByIsbn(searchFor);
+                        new Thread() {
+                            public void run() {
+                                try {
+                                    List<Book> result = booksDb.searchBooksByIsbn(searchFor);
+                                    javafx.application.Platform.runLater(
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    booksView.displayBooks(result);
+                                                }
+                                            }
+                                    );
+                                } catch (BooksDbException e) {
+                                    booksView.showAlertAndWait("", ERROR);
+                                }
+                            }
+                        }.start();
                         break;
                     case Author:
-                        result = booksDb.searchBooksByAuthor(searchFor);
+                        new Thread() {
+                            public void run() {
+                                try {
+                                    List<Book> result = booksDb.searchBooksByAuthor(searchFor);
+                                    javafx.application.Platform.runLater(
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    booksView.displayBooks(result);
+                                                }
+                                            }
+                                    );
+                                } catch (BooksDbException e) {
+                                    booksView.showAlertAndWait("", ERROR);
+                                }
+                            }
+                        }.start();
                         break;
                     case Rating:
-                        result = booksDb.searchBooksByRating(Integer.parseInt(searchFor));
+                        new Thread() {
+                            public void run() {
+                                try {
+                                    List<Book> result = booksDb.searchBooksByRating(Integer.parseInt(searchFor));
+                                    javafx.application.Platform.runLater(
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    booksView.displayBooks(result);
+                                                }
+                                            }
+                                    );
+                                } catch (BooksDbException e) {
+                                    booksView.showAlertAndWait("", ERROR);
+                                }
+                            }
+                        }.start();
                         break;
                     case Genre:
-                        result = booksDb.searchBooksByGenre(searchFor);
+                        new Thread() {
+                            public void run() {
+                                try {
+                                    List<Book> result = booksDb.searchBooksByGenre(searchFor);
+                                    javafx.application.Platform.runLater(
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    booksView.displayBooks(result);
+                                                }
+                                            }
+                                    );
+                                } catch (BooksDbException e) {
+                                    booksView.showAlertAndWait("", ERROR);
+                                }
+                            }
+                        }.start();
                     default:
-                        result = new ArrayList<>();
+                         result = new ArrayList<>();
                 }
-                if (result == null || result.isEmpty()) {
-                    booksView.showAlertAndWait(
-                            "No results found.", INFORMATION);
-                } else {
-                    booksView.displayBooks(result);
-                }
+//                if (result == null || result.isEmpty()) {
+//                    booksView.showAlertAndWait(
+//                            "No results found.", INFORMATION);
+//                } else {
+//                    booksView.displayBooks(result);
+//                }
             } else {
                 booksView.showAlertAndWait(
                         "Enter a search string!", WARNING);

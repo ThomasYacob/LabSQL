@@ -16,7 +16,6 @@ public class Main extends Application {
 
         BooksDbImpl booksDb = new BooksDbImpl(); // model
         // Don't forget to connect to the db, somewhere...
-//        primaryStage.set
         BooksPane root = new BooksPane(booksDb);
 
         Scene scene = new Scene(root, 800, 600);

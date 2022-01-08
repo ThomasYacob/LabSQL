@@ -2,9 +2,10 @@ package com.redvethomas.labsql.View;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import com.redvethomas.labsql.Controller.Controller;
-import com.redvethomas.labsql.Model.Author;
+import com.redvethomas.labsql.Model.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,9 +18,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import com.redvethomas.labsql.Model.Book;
-import com.redvethomas.labsql.Model.BooksDbImpl;
-import com.redvethomas.labsql.Model.SearchMode;
 
 
 /**
@@ -43,6 +41,9 @@ public class BooksPane extends VBox {
 
     private Book books;
     private Author authors;
+
+    private BookDialog bookDialog = new BookDialog();
+    private AuthorDialog authorDialog = new AuthorDialog();
 
     private MenuBar menuBar;
 
@@ -111,7 +112,7 @@ public class BooksPane extends VBox {
         TableColumn<Book, Integer> ratingCol = new TableColumn<>("Rating");
         booksTable.getColumns().addAll(titleCol, isbnCol, publishedCol, authorCol, genreCol, ratingCol);
         // give title column some extra space
-        titleCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.5));
+//        titleCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.5));
 
         // define how to fill data for each cell, 
         // get values from Book properties
@@ -188,7 +189,13 @@ public class BooksPane extends VBox {
         EventHandler<ActionEvent> addHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                controller.addBook(books);
+                Optional<Book> result = bookDialog.showAndWait();
+                if(result.isPresent()) {
+                    Book book = result.get();
+                    controller.addBook(books);
+                } else {
+                    System.out.println("Hej");
+                }
             }
         };
         addBookItem.addEventHandler(ActionEvent.ACTION, addHandler);
@@ -197,7 +204,13 @@ public class BooksPane extends VBox {
         EventHandler<ActionEvent> addAuthorHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                controller.addAuthor(authors);
+                Optional<Author> result = authorDialog.showAndWait();
+                if(result.isPresent()) {
+                    Author author = result.get();
+                    controller.addAuthor(authors);
+                } else {
+                    System.out.println("då");
+                }
             }
         };
         addAuthorItem.addEventHandler(ActionEvent.ACTION, addAuthorHandler);

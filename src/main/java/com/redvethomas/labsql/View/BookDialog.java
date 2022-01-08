@@ -51,12 +51,12 @@ public class BookDialog extends Dialog<Book> {
         grid.add(isbnField, 2, 1);
         grid.add(new Label("Title "), 1, 2);
         grid.add(titleField, 2, 2);
-        grid.add(new Label("Published"), 1, 3);
-        grid.add(titleField, 2, 3);
+        grid.add(new Label("Published "), 1, 3);
+        grid.add(publishedField, 2, 3);
         grid.add(new Label("Genre "), 1, 4);
         grid.add(genreChoice, 2, 4);
-        grid.add(new Label("Rating"), 1, 5);
-        grid.add(titleField, 2, 5);
+        grid.add(new Label("Rating "), 1, 5);
+        grid.add(ratingField, 2, 5);
 
 
         this.getDialogPane().setContent(grid);

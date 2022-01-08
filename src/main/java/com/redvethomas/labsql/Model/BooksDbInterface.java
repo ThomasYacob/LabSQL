@@ -23,10 +23,10 @@ public interface BooksDbInterface {
      * @param database
      * @return true on successful connection.
      */
-    public boolean connect(String database) throws BooksDbException, SQLException;
+    public boolean connect(String database) throws BooksDbException;
     public void disconnect() throws BooksDbException;
     public void addBook(Book book) throws BooksDbException, SQLException;
-    public void addAuthor(Author author) throws BooksDbException;
+    public void addAuthor(Author author) throws BooksDbException, SQLException;
 
     public List<Book> searchBooksByTitle(String searchTitle) throws BooksDbException, SQLException;
     public List<Book> searchBooksByIsbn(String searchISBN) throws BooksDbException;
