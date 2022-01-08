@@ -189,14 +189,11 @@ public class BooksPane extends VBox {
         EventHandler<ActionEvent> addHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Optional<Book> result = bookDialog.showAndWait();
-                if(result.isPresent()) {
+                    Optional<Book> result = bookDialog.showAndWait();
                     Book book = result.get();
-                    controller.addBook(books);
-                } else {
-                    System.out.println("Hej");
+                    controller.addBook(book);
+
                 }
-            }
         };
         addBookItem.addEventHandler(ActionEvent.ACTION, addHandler);
 
@@ -205,12 +202,8 @@ public class BooksPane extends VBox {
             @Override
             public void handle(ActionEvent event) {
                 Optional<Author> result = authorDialog.showAndWait();
-                if(result.isPresent()) {
-                    Author author = result.get();
-                    controller.addAuthor(authors);
-                } else {
-                    System.out.println("då");
-                }
+                Author author = result.get();
+                controller.addAuthor(author);
             }
         };
         addAuthorItem.addEventHandler(ActionEvent.ACTION, addAuthorHandler);
