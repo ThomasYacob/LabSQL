@@ -35,10 +35,18 @@ public class Author {
         return authorName;
     }
 
+    /**
+     * This is a setter for the authors name
+     * @param authorName The name that wants to be set
+     */
     public void setName(String authorName) {
         this.authorName = authorName;
     }
 
+    /**
+     * This is a getter for the authors date of birth
+     * @return returns the authors date of birth
+     */
     public Date getDateOfBirth() {
         return dateOfBirth;
     }
