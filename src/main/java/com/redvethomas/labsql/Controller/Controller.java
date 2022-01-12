@@ -13,18 +13,26 @@ import static javafx.scene.control.Alert.AlertType.*;
  * The controller is responsible for handling user requests and update the view
  * (and in some cases the model).
  *
- * @author anderslm@kth.se
+ * @author Thomas Yacob & Redve Ahmed
  */
 public class Controller {
 
     private final BooksPane booksView; // view
     private final BooksDbInterface booksDb; // model
 
+    /**
+     * This is a constructor for the controller
+     * @param booksDb the booksDb interface
+     * @param booksView the booksView
+     */
     public Controller(BooksDbInterface booksDb, BooksPane booksView) {
         this.booksDb = booksDb;
         this.booksView = booksView;
     }
 
+    /**
+     * This is a method that connects to the database
+     */
     public void connectDatabase() {
         try {
             booksDb.connect("BooksDB");
@@ -33,6 +41,9 @@ public class Controller {
         };
     }
 
+    /**
+     * This is a method that disconnects the database
+     */
     public void disconnectDatabase() {
         try {
             booksDb.disconnect();
@@ -41,6 +52,22 @@ public class Controller {
         }
     }
 
+    /**
+     * This is a method that removes a book from the database
+     * @param isbn the isbn string
+     */
+    public void bookRemoval(String isbn) {
+        try {
+            booksDb.removeBook(isbn);
+        } catch (BooksDbException e) {
+            booksView.showAlertAndWait("Book not found",ERROR);
+        }
+    }
+
+    /**
+     * This is a method that adds a book into the database
+     * @param book the book object
+     */
     public void addBook(Book book) {
         new Thread() {
             public void run() {
@@ -60,20 +87,16 @@ public class Controller {
                                 }
                             }
                     );
-//                } catch (SQLException e) {
-//                    javafx.application.Platform.runLater(
-//                            new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    booksView.showAlertAndWait("2", ERROR);
-//                                }
-//                            }
-//                    );
                 }
             }
         }.start();
     }
 
+    /**
+     * This is a method that adds an author into an existing book
+     * @param author the author object
+     * @param Isbn the Isbn string to connect to BookAuthor
+     */
     public void addAuthor(Author author, String Isbn) {
         new Thread() {
             public void run() {
@@ -93,6 +116,11 @@ public class Controller {
         }.start();
     }
 
+    /**
+     * This is a method for different types of search modes
+     * @param searchFor This is the string that is going to be searched for
+     * @param mode This is which mode that is chosen to be searched by
+     */
     public void onSearchSelected(String searchFor, SearchMode mode) {
         try {
             if (searchFor != null && searchFor.length() > 0) {
@@ -108,7 +136,6 @@ public class Controller {
                                                 @Override
                                                 public void run() {
                                                     booksView.displayBooks(result);
-
                                                 }
                                             }
                                     );
@@ -196,12 +223,6 @@ public class Controller {
                     default:
                          result = new ArrayList<>();
                 }
-//                if (result == null || result.isEmpty()) {
-//                    booksView.showAlertAndWait(
-//                            "No results found.", INFORMATION);
-//                } else {
-//                    booksView.displayBooks(result);
-//                }
             } else {
                 booksView.showAlertAndWait(
                         "Enter a search string!", WARNING);

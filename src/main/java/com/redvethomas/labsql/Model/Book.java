@@ -22,14 +22,20 @@ public class Book {
     private String storyLine = "";
     private Genre genre;
     private int rating;
-    private String authorName;
     private ArrayList<Author> authors;
 
-    // TODO:
-    // Add authors, as a separate class(!), and corresponding methods, to your implementation
-    // as well, i.e. "private ArrayList<Author> authors;"
-    
-    public Book(String isbn, String title, Genre genre, int rating, Date published, String authorName, String authorId, Date dateOfBirth) {
+    /**
+     * This is a constructor for the book object
+     * @param isbn
+     * @param title
+     * @param genre
+     * @param rating
+     * @param published
+     * @param authorName
+     * @param authorId
+     * @param dateOfBirth
+     */
+    public Book(String isbn, String title, Genre genre, int rating, Date published, String authorName, int authorId, Date dateOfBirth) {
         if(!isValidIsbn(isbn)) {
             throw new IllegalArgumentException("Invalid isbn");
         }
@@ -38,7 +44,6 @@ public class Book {
         this.genre = genre;
         this.rating = rating;
         this.published = published;
-        this.authorName = authorName;
         this.authors = new ArrayList<>();
         authors.add(new Author(authorName, dateOfBirth, authorId));
     }
@@ -68,9 +73,6 @@ public class Book {
     public String getStoryLine() { return storyLine; }
     public int getRating() {
         return rating;
-    }
-    public String getAuthorName() {
-        return authorName;
     }
 
     public void setStoryLine(String storyLine) {

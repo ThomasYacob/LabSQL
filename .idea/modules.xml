@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/LabSQL.iml" filepath="$PROJECT_DIR$/LabSQL.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LabMongoDB.iml" filepath="$PROJECT_DIR$/LabMongoDB.iml" />
     </modules>
   </component>
 </project>

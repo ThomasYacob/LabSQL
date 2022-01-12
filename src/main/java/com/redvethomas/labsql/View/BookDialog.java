@@ -92,7 +92,7 @@ public class BookDialog extends Dialog<Book> {
                                 Integer.parseInt(ratingField.getText()),
                                 valueOf(publishedField.getValue()),
                                 authorNameField.getText(),
-                                authorIdField.getText(),
+                                Integer.parseInt(authorIdField.getText()),
                                 valueOf(dateOfBirthField.getValue()));
                         System.out.println(result.toString());
                     }

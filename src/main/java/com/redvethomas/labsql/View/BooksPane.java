@@ -24,7 +24,7 @@ import javafx.scene.layout.VBox;
  * The main pane for the view, extending VBox and including the menus. An
  * internal BorderPane holds the TableView for books and a search utility.
  *
- * @author anderslm@kth.se
+ * @author Thomas Yacob & Redve Ahmed
  */
 public class BooksPane extends VBox {
 
@@ -120,7 +120,7 @@ public class BooksPane extends VBox {
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         isbnCol.setCellValueFactory(new PropertyValueFactory<>("isbn"));
         publishedCol.setCellValueFactory(new PropertyValueFactory<>("published"));
-        authorCol.setCellValueFactory(new PropertyValueFactory<>("authorName"));
+        authorCol.setCellValueFactory(new PropertyValueFactory<>("authors"));
         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
         ratingCol.setCellValueFactory(new PropertyValueFactory<>("rating"));
 
@@ -213,6 +213,16 @@ public class BooksPane extends VBox {
 
 
         MenuItem removeItem = new MenuItem("Remove");
+        EventHandler<ActionEvent> addRemoveHandler = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Optional<String> resultIsbn = isbnDialog.showAndWait();
+                String isbn = resultIsbn.get();
+                controller.bookRemoval(isbn);
+            }
+        };
+        removeItem.addEventHandler(ActionEvent.ACTION, addRemoveHandler);
+
         MenuItem updateItem = new MenuItem("Update");
         manageMenu.getItems().addAll(addBookItem, addAuthorItem, removeItem, updateItem);
 

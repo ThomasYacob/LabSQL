@@ -15,7 +15,7 @@ import java.util.List;
  * <p>
  * Your implementation must access a real database.
  *
- * @author anderslm@kth.se
+ * @author Thomas Yacob & Redve Ahmed
  */
 public class BooksDbImpl implements BooksDbInterface {
 
@@ -28,6 +28,12 @@ public class BooksDbImpl implements BooksDbInterface {
         connection = null;
     }
 
+    /**
+     * This method is used for connecting to a database
+     * @param database which database to be connected to
+     * @return returns
+     * @throws BooksDbException
+     */
         @Override
         public boolean connect(String database) throws BooksDbException {;
             String username = "root";
@@ -47,6 +53,10 @@ public class BooksDbImpl implements BooksDbInterface {
             return false;
     }
 
+    /**
+     * This is a method that disconnects the active program from the database
+     * @throws BooksDbException
+     */
     @Override
     public void disconnect() throws BooksDbException {
         if(connection != null) {
@@ -59,6 +69,12 @@ public class BooksDbImpl implements BooksDbInterface {
         }
     }
 
+    /**
+     * This is a method that adds a book into the database
+     * @param book The book object that is added
+     * @throws BooksDbException if the book is not added successfully, a BooksDbException is thrown
+     * @throws SQLException
+     */
     @Override
     public void addBook(Book book) throws BooksDbException, SQLException {
         if(book == null) {
@@ -84,14 +100,19 @@ public class BooksDbImpl implements BooksDbInterface {
             statement.setString(2, book.getIsbn());
             statement.executeUpdate();
 
-            statement = connection.prepareStatement("INSERT INTO Author VALUES(?, ?, ?)");
-            statement.setString(1, book.getAuthorName());
+            statement = connection.prepareStatement("INSERT INTO Author VALUES(?, ?)", Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, book.getAuthors().get(0).getName());
             statement.setDate(2, Date.valueOf(String.valueOf(book.getAuthors().get(0).getDateOfBirth())));
-            statement.setString(3, book.getAuthors().get(0).getAuthorID());
+//            statement.setString(3, Integer.toString(book.getAuthors().get(0).getAuthorID()));
             statement.executeUpdate();
 
+            ResultSet rs = statement.getGeneratedKeys();
+            int key = rs.getInt(1);
+            book.getAuthors().get(0).setAuthorId(key);
+
+
             statement = connection.prepareStatement("INSERT INTO BookAuthor VALUES(?, ?)");
-            statement.setString(1, book.getAuthors().get(0).getAuthorID());
+            statement.setString(1, Integer.toString(book.getAuthors().get(0).getAuthorID()));
             statement.setString(2, book.getIsbn());
             statement.executeUpdate();
             connection.commit();
@@ -108,6 +129,13 @@ public class BooksDbImpl implements BooksDbInterface {
         }
     }
 
+    /**
+     * This is a method that adds an author into an existing book
+     * @param author The author object that is being added
+     * @param Isbn This is the ISBN of the book
+     * @throws BooksDbException if an author is not added successfully, a BooksDbException is thrown
+     * @throws SQLException
+     */
     @Override
     public void addAuthor(Author author, String Isbn) throws BooksDbException, SQLException {
         if(author == null) {
@@ -120,13 +148,14 @@ public class BooksDbImpl implements BooksDbInterface {
             statement = connection.prepareStatement("INSERT INTO Author(Name, dateOfBirth, authorId) VALUES(?, ?, ?)");
             statement.setString(1, author.getName());
             statement.setString(2, String.valueOf(author.getDateOfBirth()));
-            statement.setString(3, author.getAuthorID());
+            statement.setString(3, Integer.toString(author.getAuthorID()));
             statement.executeUpdate();
 
             statement = connection.prepareStatement("INSERT INTO BookAuthor(authorId, isbn) VALUES(?, ?)");
-            statement.setString(1, author.getAuthorID());
+            statement.setString(1, Integer.toString(author.getAuthorID()));
             statement.setString(2, Isbn);
             statement.executeUpdate();
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -141,6 +170,49 @@ public class BooksDbImpl implements BooksDbInterface {
         }
     }
 
+    /**
+     * This is a method that removes a specifik book from the database
+     * @param isbn This is the ISBN of the book
+     * @throws BooksDbException if the book is not removed successfully, a BooksDbException is thrown
+     * @throws SQLException
+     */
+    @Override
+    public void removeBook(String isbn) throws BooksDbException, SQLException {
+            PreparedStatement statement = null;
+            ResultSet rs = null;
+            int tempAuthorID;
+
+            try{
+                statement = connection.prepareStatement("DELETE FROM Book WHERE isbn = " + isbn);
+                statement.executeUpdate();
+
+                statement = connection.prepareStatement("DELETE FROM Genre WHERE isbn = " + isbn);
+                statement.executeUpdate();
+
+                statement = connection.prepareStatement("DELETE FROM Rating WHERE isbn = " + isbn);
+                statement.executeUpdate();
+
+                statement = connection.prepareStatement("SELECT * FROM BookAuthor WHERE isbn = " + isbn);
+                rs = statement.executeQuery();
+                tempAuthorID = rs.getInt("AuthorID");
+                statement = connection.prepareStatement("DELETE FROM Author WHERE authorId = " + tempAuthorID);
+                statement.executeUpdate();
+
+                statement = connection.prepareStatement("DELETE FROM BookAuthor WHERE isbn = " + isbn);
+                statement.executeUpdate();
+
+            }  catch (SQLException e) {
+                throw new BooksDbException();
+            }
+
+    }
+
+    /**
+     * This is a method that searches for books by the title
+     * @param searchTitle the inserted title string
+     * @return returns the corresponding book object
+     * @throws BooksDbException if the book is not found, a BooksDbException is thrown
+     */
     @Override
     public List<Book> searchBooksByTitle(String searchTitle) throws BooksDbException {
         List<Book> result = new ArrayList<>();
@@ -160,7 +232,7 @@ public class BooksDbImpl implements BooksDbInterface {
                         rs.getString("Title"),
                         Book.Genre.valueOf(rs.getString("Genre")),
                         rs.getInt("Rating"), rs.getDate("Published"),
-                        rs.getString("Name"), rs.getString("AuthorID"),
+                        rs.getString("Name"), rs.getInt("AuthorID"),
                         rs.getDate("dateOfBirth"));
                 result.add(book);
             }
@@ -182,19 +254,24 @@ public class BooksDbImpl implements BooksDbInterface {
         return result;
     }
 
+    /**
+     * This is a method that searches for books by isbn
+     * @param searchIsbn the inserted isbn string
+     * @return returns the corresponding book object
+     * @throws BooksDbException if the book is not found, a BooksDbException is thrown
+     */
     @Override
     public List<Book> searchBooksByIsbn(String searchIsbn) throws BooksDbException {
         List<Book> result = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement statement = null;
         try {
-            String sql = "SELECT * FROM Book " +
+            statement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
                     "join Author ON (BookAuthor.authorId = Author.authorId)" +
-                    "WHERE Book.isbn LIKE '%" + searchIsbn + "%'";
-            statement = connection.prepareStatement(sql);
+                    "WHERE Book.isbn LIKE '%" + searchIsbn + "%'");
             rs = statement.executeQuery();
             while (rs.next()) {
                 Book book = new Book(
@@ -202,7 +279,7 @@ public class BooksDbImpl implements BooksDbInterface {
                         rs.getString("Title"),
                         Book.Genre.valueOf(rs.getString("Genre")),
                         rs.getInt("Rating"), rs.getDate("Published"),
-                        rs.getString("Name"), rs.getString("AuthorID"),
+                        rs.getString("Name"), rs.getInt("AuthorID"),
                         rs.getDate("dateOfBirth"));
                 result.add(book);
             }
@@ -224,19 +301,24 @@ public class BooksDbImpl implements BooksDbInterface {
         return result;
     }
 
+    /**
+     * This is a method that searches for books by the author
+     * @param searchAuthor the inserted author string
+     * @return returns the corresponding book object
+     * @throws BooksDbException if the book is not found, a BooksDbException is thrown
+     */
     @Override
     public List<Book> searchBooksByAuthor(String searchAuthor) throws BooksDbException {
         List<Book> result = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement statement = null;
         try {
-            String sql = "SELECT * FROM Author " +
+            statement = connection.prepareStatement("SELECT * FROM Author " +
                     "JOIN BookAuthor ON (Author.authorId = BookAuthor.authorId)" +
                     "JOIN Book ON (BookAuthor.isbn = Book.isbn)" +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
-                    "WHERE Author.Name LIKE '%" + searchAuthor + "%'";
-            statement = connection.prepareStatement(sql);
+                    "WHERE Author.Name LIKE '%" + searchAuthor + "%'");
             rs = statement.executeQuery();
             while (rs.next()) {
                 Book book = new Book(
@@ -244,7 +326,7 @@ public class BooksDbImpl implements BooksDbInterface {
                         rs.getString("Title"),
                         Book.Genre.valueOf(rs.getString("Genre")),
                         rs.getInt("Rating"), rs.getDate("Published"),
-                        rs.getString("Name"), rs.getString("AuthorID"),
+                        rs.getString("Name"), rs.getInt("AuthorID"),
                         rs.getDate("dateOfBirth"));
                 result.add(book);
             }
@@ -266,19 +348,24 @@ public class BooksDbImpl implements BooksDbInterface {
         return result;
     }
 
+    /**
+     * This is a method that searches for books by rating
+     * @param searchRating the inserted rating integer
+     * @return returns the corresponding book object
+     * @throws BooksDbException if the book is not found, a BooksDbException is thrown
+     */
     @Override
     public List<Book> searchBooksByRating(int searchRating) throws BooksDbException {
         List<Book> result = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement statement = null;
         try {
-            String sql = "SELECT * FROM Book " +
+            statement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
                     "join Author ON (BookAuthor.authorId = Author.authorId)" +
-                    "WHERE Rating.rating LIKE '%" + searchRating + "%'";
-            statement = connection.prepareStatement(sql);
+                    "WHERE Rating.rating LIKE '%" + searchRating + "%'");
             rs = statement.executeQuery();
             while (rs.next()) {
                 Book book = new Book(
@@ -286,7 +373,7 @@ public class BooksDbImpl implements BooksDbInterface {
                         rs.getString("Title"),
                         Book.Genre.valueOf(rs.getString("Genre")),
                         rs.getInt("Rating"), rs.getDate("Published"),
-                        rs.getString("Name"), rs.getString("AuthorID"),
+                        rs.getString("Name"), rs.getInt("AuthorID"),
                         rs.getDate("dateOfBirth"));
                 result.add(book);
             }
@@ -308,19 +395,24 @@ public class BooksDbImpl implements BooksDbInterface {
         return result;
     }
 
+    /**
+     * This is a method that searches for books by genre
+     * @param searchGenre the inserted genre string
+     * @return returns the corresponding book object
+     * @throws BooksDbException if the book is not found, a BooksDbException is thrown
+     */
     @Override
     public List<Book> searchBooksByGenre(String searchGenre) throws BooksDbException {
         List<Book> result = new ArrayList<>();
         ResultSet rs = null;
         PreparedStatement statement = null;
         try {
-            String sql = "SELECT * FROM Book " +
+            statement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
                     "join Author ON (BookAuthor.authorId = Author.authorId)" +
-                    "WHERE genre LIKE '%" + searchGenre + "%'";
-            statement = connection.prepareStatement(sql);
+                    "WHERE genre LIKE '%" + searchGenre + "%'");
             rs = statement.executeQuery();
             while (rs.next()) {
                 Book book = new Book(
@@ -328,7 +420,7 @@ public class BooksDbImpl implements BooksDbInterface {
                         rs.getString("Title"),
                         Book.Genre.valueOf(rs.getString("Genre")),
                         rs.getInt("Rating"), rs.getDate("Published"),
-                        rs.getString("Name"), rs.getString("AuthorID"),
+                        rs.getString("Name"), rs.getInt("AuthorID"),
                         rs.getDate("dateOfBirth"));
                 result.add(book);
             }

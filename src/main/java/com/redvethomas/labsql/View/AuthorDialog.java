@@ -69,7 +69,7 @@ public class AuthorDialog extends Dialog<Author>{
                         result = new Author(
                                 authorNameField.getText(),
                                 valueOf(dateOfBirthField.getValue()),
-                                authorIDField.getText());
+                                Integer.parseInt(authorIDField.getText()));
                     }
                 }
 
