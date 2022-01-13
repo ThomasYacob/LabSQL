@@ -61,8 +61,8 @@ public class BookDialog extends Dialog<Book> {
         grid.add(authorNameField, 2, 6);
         grid.add(new Label("Date of Birth"), 1, 7);
         grid.add(dateOfBirthField, 2, 7);
-        grid.add(new Label("AuthorID"), 1, 8);
-        grid.add(authorIdField, 2, 8);
+//        grid.add(new Label("AuthorID"), 1, 8);
+//        grid.add(authorIdField, 2, 8);
 
 
         this.getDialogPane().setContent(grid);

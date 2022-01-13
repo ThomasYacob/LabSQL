@@ -59,7 +59,7 @@ public class Controller {
     public void bookRemoval(String isbn) {
         try {
             booksDb.removeBook(isbn);
-        } catch (BooksDbException e) {
+        } catch (BooksDbException | SQLException e) {
             booksView.showAlertAndWait("Book not found",ERROR);
         }
     }

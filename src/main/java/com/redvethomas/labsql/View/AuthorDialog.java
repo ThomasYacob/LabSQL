@@ -44,8 +44,8 @@ public class AuthorDialog extends Dialog<Author>{
         grid.add(authorNameField, 2, 1);
         grid.add(new Label("Date of birth"), 1, 2);
         grid.add(dateOfBirthField, 2, 2);
-        grid.add(new Label("AuthorID "), 1, 3);
-        grid.add(authorIDField, 2, 3);
+//        grid.add(new Label("AuthorID "), 1, 3);
+//        grid.add(authorIDField, 2, 3);
 
         this.getDialogPane().setContent(grid);
 
@@ -68,8 +68,8 @@ public class AuthorDialog extends Dialog<Author>{
                     if (isValidData()) {
                         result = new Author(
                                 authorNameField.getText(),
-                                valueOf(dateOfBirthField.getValue()),
-                                Integer.parseInt(authorIDField.getText()));
+                                valueOf(dateOfBirthField.getValue()));
+//                                Integer.parseInt(authorIDField.getText()));
                     }
                 }
 

@@ -44,6 +44,7 @@ public class Book {
         this.genre = genre;
         this.rating = rating;
         this.published = published;
+        this.authorName = authorName;
         this.authors = new ArrayList<>();
         authors.add(new Author(authorName, dateOfBirth, authorId));
     }

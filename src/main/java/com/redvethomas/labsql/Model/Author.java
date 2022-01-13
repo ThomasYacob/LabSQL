@@ -31,7 +31,7 @@ public class Author {
      * This is a getter for the authors name
      * @return returns the authors name
      */
-    public String getName() {
+    public String getAuthorName() {
         return authorName;
     }
 
