@@ -239,6 +239,7 @@ public class BooksDbImpl implements BooksDbInterface {
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "WHERE title LIKE '%" + searchTitle + "%'");
             rs = statement.executeQuery();
+
             while (rs.next()) {
                 Book book = new Book(
                         rs.getString("ISBN"),
@@ -304,24 +305,50 @@ public class BooksDbImpl implements BooksDbInterface {
         ResultSet rs = null;
         PreparedStatement statement = null;
         try {
+
             statement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
-                    "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
-                    "join Author ON (BookAuthor.authorId = Author.authorId)" +
                     "WHERE Book.isbn LIKE '%" + searchIsbn + "%'");
             rs = statement.executeQuery();
+
             while (rs.next()) {
                 Book book = new Book(
                         rs.getString("ISBN"),
                         rs.getString("Title"),
                         Book.Genre.valueOf(rs.getString("Genre")),
-                        rs.getInt("Rating"), rs.getDate("Published"),
-                        rs.getString("Name"), rs.getInt("AuthorID"),
-                        rs.getDate("dateOfBirth"));
+                        rs.getInt("Rating"), rs.getDate("Published"));
                 result.add(book);
             }
+            System.out.println(result);
+            statement.clearParameters();
+            for (int i = 0; i < result.size(); i++){
+                statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
+                        "WHERE isbn = " +
+                        result.get(i).getIsbn());
+                rs = statement.executeQuery();
+                ArrayList<Integer> tmpID = new ArrayList<Integer>();
+                while(rs.next()){
+                    tmpID.add(rs.getInt("AuthorID"));
+                }
+                statement.clearParameters();
+
+                for (int j = 0; j < tmpID.size(); j++){
+                    statement = connection.prepareStatement("SELECT * FROM Author " +
+                            "WHERE authorId = " + tmpID.get(j));
+                    rs = statement.executeQuery();
+                    while (rs.next()){
+                        Author author = new Author(
+                                rs.getString("Name"),
+                                rs.getDate("dateOfBirth"),
+                                rs.getInt("AuthorID"));
+                        result.get(i).addAuthor(author);
+                    }
+                    statement.clearParameters();
+                }
+            }
             return result;
+
         } catch (SQLException e) {
             try {
                 throw e;
@@ -351,24 +378,49 @@ public class BooksDbImpl implements BooksDbInterface {
         ResultSet rs = null;
         PreparedStatement statement = null;
         try {
-            statement = connection.prepareStatement("SELECT * FROM Author " +
-                    "JOIN BookAuthor ON (Author.authorId = BookAuthor.authorId)" +
-                    "JOIN Book ON (BookAuthor.isbn = Book.isbn)" +
+
+            statement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
                     "join Author on (BookAuthor.authorId = Author.authorId)" +
                     "WHERE Author.Name LIKE '%" + searchAuthor + "%'");
             rs = statement.executeQuery();
+
             while (rs.next()) {
                 Book book = new Book(
                         rs.getString("ISBN"),
                         rs.getString("Title"),
                         Book.Genre.valueOf(rs.getString("Genre")),
-                        rs.getInt("Rating"), rs.getDate("Published"),
-                        rs.getString("Name"), rs.getInt("AuthorID"),
-                        rs.getDate("dateOfBirth"));
+                        rs.getInt("Rating"), rs.getDate("Published"));
                 result.add(book);
+            }
+            System.out.println(result);
+            statement.clearParameters();
+            for (int i = 0; i < result.size(); i++){
+                statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
+                        "WHERE isbn = " +
+                        result.get(i).getIsbn());
+                rs = statement.executeQuery();
+                ArrayList<Integer> tmpID = new ArrayList<Integer>();
+                while(rs.next()){
+                    tmpID.add(rs.getInt("AuthorID"));
+                }
+                statement.clearParameters();
+
+                for (int j = 0; j < tmpID.size(); j++){
+                    statement = connection.prepareStatement("SELECT * FROM Author " +
+                            "WHERE authorId = " + tmpID.get(j));
+                    rs = statement.executeQuery();
+                    while (rs.next()){
+                        Author author = new Author(
+                                rs.getString("Name"),
+                                rs.getDate("dateOfBirth"),
+                                rs.getInt("AuthorID"));
+                        result.get(i).addAuthor(author);
+                    }
+                    statement.clearParameters();
+                }
             }
             return result;
         } catch (SQLException e) {
@@ -400,22 +452,47 @@ public class BooksDbImpl implements BooksDbInterface {
         ResultSet rs = null;
         PreparedStatement statement = null;
         try {
+
             statement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
-                    "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
-                    "join Author ON (BookAuthor.authorId = Author.authorId)" +
                     "WHERE Rating.rating LIKE '%" + searchRating + "%'");
             rs = statement.executeQuery();
+
             while (rs.next()) {
                 Book book = new Book(
                         rs.getString("ISBN"),
                         rs.getString("Title"),
                         Book.Genre.valueOf(rs.getString("Genre")),
-                        rs.getInt("Rating"), rs.getDate("Published"),
-                        rs.getString("Name"), rs.getInt("AuthorID"),
-                        rs.getDate("dateOfBirth"));
+                        rs.getInt("Rating"), rs.getDate("Published"));
                 result.add(book);
+            }
+            System.out.println(result);
+            statement.clearParameters();
+            for (int i = 0; i < result.size(); i++){
+                statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
+                        "WHERE isbn = " +
+                        result.get(i).getIsbn());
+                rs = statement.executeQuery();
+                ArrayList<Integer> tmpID = new ArrayList<Integer>();
+                while(rs.next()){
+                    tmpID.add(rs.getInt("AuthorID"));
+                }
+                statement.clearParameters();
+
+                for (int j = 0; j < tmpID.size(); j++){
+                    statement = connection.prepareStatement("SELECT * FROM Author " +
+                            "WHERE authorId = " + tmpID.get(j));
+                    rs = statement.executeQuery();
+                    while (rs.next()){
+                        Author author = new Author(
+                                rs.getString("Name"),
+                                rs.getDate("dateOfBirth"),
+                                rs.getInt("AuthorID"));
+                        result.get(i).addAuthor(author);
+                    }
+                    statement.clearParameters();
+                }
             }
             return result;
         } catch (SQLException e) {
@@ -447,24 +524,50 @@ public class BooksDbImpl implements BooksDbInterface {
         ResultSet rs = null;
         PreparedStatement statement = null;
         try {
+
             statement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
-                    "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
-                    "join Author ON (BookAuthor.authorId = Author.authorId)" +
                     "WHERE genre LIKE '%" + searchGenre + "%'");
             rs = statement.executeQuery();
+
             while (rs.next()) {
                 Book book = new Book(
                         rs.getString("ISBN"),
                         rs.getString("Title"),
                         Book.Genre.valueOf(rs.getString("Genre")),
-                        rs.getInt("Rating"), rs.getDate("Published"),
-                        rs.getString("Name"), rs.getInt("AuthorID"),
-                        rs.getDate("dateOfBirth"));
+                        rs.getInt("Rating"), rs.getDate("Published"));
                 result.add(book);
             }
+            System.out.println(result);
+            statement.clearParameters();
+            for (int i = 0; i < result.size(); i++){
+                statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
+                        "WHERE isbn = " +
+                        result.get(i).getIsbn());
+                rs = statement.executeQuery();
+                ArrayList<Integer> tmpID = new ArrayList<Integer>();
+                while(rs.next()){
+                    tmpID.add(rs.getInt("AuthorID"));
+                }
+                statement.clearParameters();
+
+                for (int j = 0; j < tmpID.size(); j++){
+                    statement = connection.prepareStatement("SELECT * FROM Author " +
+                            "WHERE authorId = " + tmpID.get(j));
+                    rs = statement.executeQuery();
+                    while (rs.next()){
+                        Author author = new Author(
+                                rs.getString("Name"),
+                                rs.getDate("dateOfBirth"),
+                                rs.getInt("AuthorID"));
+                        result.get(i).addAuthor(author);
+                    }
+                    statement.clearParameters();
+                }
+            }
             return result;
+
         } catch (SQLException e) {
             try {
                 throw e;

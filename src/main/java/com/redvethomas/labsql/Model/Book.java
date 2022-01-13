@@ -23,6 +23,7 @@ public class Book {
     private Genre genre;
     private int rating;
     private ArrayList<Author> authors;
+    private String authorName;
 
     /**
      * This is a constructor for the book object
@@ -48,6 +49,17 @@ public class Book {
         this.authors = new ArrayList<>();
         authors.add(new Author(authorName, dateOfBirth, authorId));
     }
+    public Book(String isbn, String title,Genre genre, int rating, Date published){
+        if(!isValidIsbn(isbn)) {
+            throw new IllegalArgumentException("Invalid isbn");
+        }
+        this.isbn = isbn;
+        this.title = title;
+        this.genre = genre;
+        this.rating = rating;
+        this.published = published;
+        this.authors = new ArrayList<>();
+    }
 
     private static final Pattern isbnPattern = Pattern.compile("^[- ]?[0-9]{13}$");
     public static boolean isValidIsbn(String isbn) {
@@ -64,6 +76,16 @@ public class Book {
 
     public ArrayList<Author> getAuthors() {
         return (ArrayList<Author>) authors.clone();
+    }
+
+    public String getAuthorName(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i = 0; i < authors.size(); i++){
+            stringBuilder.append(authors.get(i).getAuthorName());
+            stringBuilder.append(", ");
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length()-1);
+        return stringBuilder.toString();
     }
     public Genre getGenre() {
         return genre;

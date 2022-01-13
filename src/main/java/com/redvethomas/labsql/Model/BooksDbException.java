@@ -15,7 +15,7 @@ package com.redvethomas.labsql.Model;
  *     throw new BooksDbException(e.getMessage(), e);
  * }
  */
-public class BooksDbException extends Exception {
+public class    BooksDbException extends Exception {
 
     public BooksDbException(String msg, Exception cause) {
         super(msg, cause);
