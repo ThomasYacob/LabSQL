@@ -111,7 +111,7 @@ public class BooksDbImpl implements BooksDbInterface {
             }
 
             statement = connection.prepareStatement("INSERT INTO BookAuthor VALUES(?, ?)");
-            statement.setString(1, Integer.toString(book.getAuthors().get(0).getAuthorID()));
+            statement.setInt(1, book.getAuthors().get(0).getAuthorID());
             statement.setString(2, book.getIsbn());
             statement.executeUpdate();
             connection.commit();
@@ -144,14 +144,19 @@ public class BooksDbImpl implements BooksDbInterface {
         try {
             connection.setAutoCommit(false);
 
-            statement = connection.prepareStatement("INSERT INTO Author(Name, dateOfBirth, authorId) VALUES(?, ?, ?)");
+            statement = connection.prepareStatement("INSERT INTO Author(Name, dateOfBirth) VALUES(?, ?)", statement.RETURN_GENERATED_KEYS);
             statement.setString(1, author.getAuthorName());
             statement.setString(2, String.valueOf(author.getDateOfBirth()));
-            statement.setString(3, Integer.toString(author.getAuthorID()));
             statement.executeUpdate();
 
+            ResultSet rs = statement.getGeneratedKeys();
+            int key = -1;
+            if(rs.next()) {
+                key = rs.getInt(1);
+            }
+
             statement = connection.prepareStatement("INSERT INTO BookAuthor(authorId, isbn) VALUES(?, ?)");
-            statement.setString(1, Integer.toString(author.getAuthorID()));
+            statement.setInt(1, key);
             statement.setString(2, Isbn);
             statement.executeUpdate();
 
@@ -384,13 +389,29 @@ public class BooksDbImpl implements BooksDbInterface {
                     "WHERE Author.Name LIKE '%" + searchAuthor + "%'");
             rs = statement.executeQuery();
 
-            while (rs.next()) {
-                Book book = new Book(
-                        rs.getString("ISBN"),
-                        rs.getString("Title"),
-                        Book.Genre.valueOf(rs.getString("Genre")),
-                        rs.getInt("Rating"), rs.getDate("Published"));
-                result.add(book);
+            List<String> tmpID1 = new ArrayList<>();
+
+            while (rs.next()){
+                tmpID1.add(rs.getString("ISBN"));
+            }
+
+            System.out.println(tmpID1);
+
+            for (int i = 0; i < tmpID1.size() ; i++) {
+                statement = connection.prepareStatement("SELECT * FROM Book " +
+                        "join Genre ON (Book.isbn = Genre.isbn)" +
+                        "join Rating ON (Book.isbn = Rating.isbn)" +
+//                        "join BookAuthor on (Book.isbn = BookAuthor.isbn)" +
+                        "WHERE Book.isbn LIKE '%" + tmpID1.get(i)  + "%'");
+                rs = statement.executeQuery();
+                while (rs.next()) {
+                    Book book = new Book(
+                            rs.getString("ISBN"),
+                            rs.getString("Title"),
+                            Book.Genre.valueOf(rs.getString("Genre")),
+                            rs.getInt("Rating"), rs.getDate("Published"));
+                    result.add(book);
+                }
             }
             System.out.println(result);
             statement.clearParameters();

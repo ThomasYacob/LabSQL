@@ -80,7 +80,7 @@ public class Book {
     }
 
     public ArrayList<Author> getAuthors() {
-        return (ArrayList<Author>) authors.clone();
+        return this.authors;
     }
 
     public String getAuthorName(){

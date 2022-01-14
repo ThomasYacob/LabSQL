@@ -1,6 +1,7 @@
 package com.redvethomas.labsql.View;
 
 
+import com.redvethomas.labsql.Model.Author;
 import com.redvethomas.labsql.Model.Book;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -90,10 +91,11 @@ public class BookDialog extends Dialog<Book> {
                                 titleField.getText(),
                                 genreChoice.getValue(),
                                 Integer.parseInt(ratingField.getText()),
-                                valueOf(publishedField.getValue()),
-                                authorNameField.getText(),
-                                Integer.parseInt(authorIdField.getText()),
+                                valueOf(publishedField.getValue()));
+
+                        Author temp = new Author(authorNameField.getText(),
                                 valueOf(dateOfBirthField.getValue()));
+                                result.addAuthor(temp);
                         System.out.println(result.toString());
                     }
                 }
