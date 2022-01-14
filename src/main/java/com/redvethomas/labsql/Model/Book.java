@@ -49,7 +49,12 @@ public class Book {
         this.authors = new ArrayList<>();
         authors.add(new Author(authorName, dateOfBirth, authorId));
     }
-    public Book(String isbn, String title,Genre genre, int rating, Date published){
+
+//    public Book(String isbn, String title, Genre genre, int rating, Date published) {
+//        this(isbn, title, genre, rating, published);
+//    }
+
+    public Book(String isbn, String title, Genre genre, int rating, Date published) {
         if(!isValidIsbn(isbn)) {
             throw new IllegalArgumentException("Invalid isbn");
         }

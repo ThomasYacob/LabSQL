@@ -35,7 +35,7 @@ public class BooksDbImpl implements BooksDbInterface {
      * @throws BooksDbException
      */
         @Override
-        public boolean connect(String database) throws BooksDbException {;
+        public boolean connect(String database) throws BooksDbException {
             String username = "root";
             String password = "godzhell1";
             String url = "jdbc:mysql://localhost:3306/" + database + "?UseClientEnc=UTF8";
@@ -100,16 +100,15 @@ public class BooksDbImpl implements BooksDbInterface {
             statement.setString(2, book.getIsbn());
             statement.executeUpdate();
 
-            statement = connection.prepareStatement("INSERT INTO Author VALUES(?, ?)", Statement.RETURN_GENERATED_KEYS);
+            statement = connection.prepareStatement("INSERT INTO Author (name, dateofbirth) VALUES(?, ?)", Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, book.getAuthors().get(0).getAuthorName());
             statement.setDate(2, Date.valueOf(String.valueOf(book.getAuthors().get(0).getDateOfBirth())));
-//            statement.setString(3, Integer.toString(book.getAuthors().get(0).getAuthorID()));
             statement.executeUpdate();
 
             ResultSet rs = statement.getGeneratedKeys();
-            int key = rs.getInt(1);
-            book.getAuthors().get(0).setAuthorId(key);
-
+            if(rs.next()) {
+                    book.getAuthors().get(0).setAuthorId(rs.getInt(1));
+            }
 
             statement = connection.prepareStatement("INSERT INTO BookAuthor VALUES(?, ?)");
             statement.setString(1, Integer.toString(book.getAuthors().get(0).getAuthorID()));
@@ -180,7 +179,6 @@ public class BooksDbImpl implements BooksDbInterface {
     public void removeBook(String isbn) throws BooksDbException, SQLException {
             PreparedStatement statement = null;
             ResultSet rs = null;
-            int tempAuthorID;
             try{
                 connection.setAutoCommit(false);
                 statement = connection.prepareStatement("DELETE FROM Rating WHERE isbn = " + isbn);
@@ -199,6 +197,7 @@ public class BooksDbImpl implements BooksDbInterface {
                 statement = connection.prepareStatement("DELETE FROM BookAuthor WHERE isbn = " + isbn);
                 statement.executeUpdate();
 
+//                for (Integer integer : tmpAuthorID) {
                 for (int i = 0; i < tmpAuthorID.size(); i++){
                     statement = connection.prepareStatement("DELETE FROM Author WHERE authorId = " + tmpAuthorID.get(i));
                     statement.executeUpdate();
@@ -214,7 +213,7 @@ public class BooksDbImpl implements BooksDbInterface {
             } finally {
                 try {
                     connection.setAutoCommit(true);
-                    statement.close();;
+                    statement.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -379,11 +378,9 @@ public class BooksDbImpl implements BooksDbInterface {
         PreparedStatement statement = null;
         try {
 
-            statement = connection.prepareStatement("SELECT * FROM Book " +
-                    "join Genre ON (Book.isbn = Genre.isbn)" +
-                    "join Rating ON (Book.isbn = Rating.isbn)" +
-                    "join BookAuthor ON (Book.isbn = BookAuthor.isbn)" +
-                    "join Author on (BookAuthor.authorId = Author.authorId)" +
+            statement = connection.prepareStatement("SELECT * FROM Author " +
+                    "join BookAuthor ON (Author.authorId = BookAuthor.authorId)" +
+//                    "join Book ON (BookAuthor.isbn = Book.isbn)" +
                     "WHERE Author.Name LIKE '%" + searchAuthor + "%'");
             rs = statement.executeQuery();
 
