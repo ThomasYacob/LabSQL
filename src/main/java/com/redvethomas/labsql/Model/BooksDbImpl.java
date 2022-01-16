@@ -527,20 +527,6 @@ public class BooksDbImpl implements BooksDbInterface {
                     }
                     statement.clearParameters();
                 }
-                for (int k = 0; k < result.size(); k++) {
-                    statement = connection.prepareStatement("SELECT * FROM Rating " +
-                            "WHERE isbn = " + result.get(k).getIsbn());
-                    rs = statement.executeQuery();
-
-                    while (rs.next()) {
-                        Review review = new Review(
-                                rs.getInt("Rating"),
-                                rs.getString("review"),
-                                rs.getDate("reviewDate"),
-                                new User(rs.getString("addedBy")));
-                        result.get(k).addReview(review);
-                    }
-                }
                 statement = connection.prepareStatement("SELECT * FROM Rating " +
                         "WHERE isbn = " + result.get(i).getIsbn());
                 rs = statement.executeQuery();
