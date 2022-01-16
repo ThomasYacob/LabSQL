@@ -13,6 +13,7 @@ public class Author {
     private final Date dateOfBirth;
     private int authorId;
     private User user;
+
     /**
      * This is the constructor for author
      * @param authorName This is the authors name
@@ -57,7 +58,7 @@ public class Author {
 
     /**
      * This is a setter for the authors name
-     * @param authorName The name that wants to be set
+     * @param authorName The name that is being set
      */
     public void setName(String authorName) {
         this.authorName = authorName;
@@ -72,16 +73,16 @@ public class Author {
     }
 
     /**
-     * This is a getter for the authors Id
-     * @return returns the author Id
+     * This is a getter for the authorId
+     * @return returns the authorId
      */
     public int getAuthorID() {
         return authorId;
     }
 
     /**
-     * This is a setter for the authors Id
-     * @param authorId The name author Id that wants to be set
+     * This is a setter for the authorId
+     * @param authorId The id that is being set for the author
      */
     public void setAuthorId(int authorId) {
         this.authorId = authorId;
