@@ -67,11 +67,11 @@ public class UserDialog extends Dialog<User>{
                                 usernameField.getText(),
                                 passwordField.getText());
                     }
-                    else if(b == guestField) {
-                        result = new User("Guest", "Password1!");
-
-                    }
                 }
+                else if(b == guestField) {
+                        result = new User("Guest", "Password1!");
+                }
+
 
                 clearFormData();
                 return result;

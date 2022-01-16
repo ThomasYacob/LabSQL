@@ -235,7 +235,6 @@ public class BooksDbImpl implements BooksDbInterface {
         PreparedStatement statement = null;
         ResultSet rs = null;
         try {
-
             statement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
@@ -250,7 +249,6 @@ public class BooksDbImpl implements BooksDbInterface {
                         rs.getInt("Rating"), rs.getDate("Published"));
                 result.add(book);
             }
-            System.out.println(result);
             statement.clearParameters();
             for (int i = 0; i < result.size(); i++){
                 statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
@@ -279,20 +277,15 @@ public class BooksDbImpl implements BooksDbInterface {
             }
             return result;
         } catch (SQLException e) {
-            try {
-                throw e;
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            throw new BooksDbException(e.getSQLState());
         } finally {
             try {
                 statement.close();
                 rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException | NullPointerException e) {
+                throw new BooksDbException("Not logged in");
             }
         }
-        return result;
     }
 
     /**
@@ -307,7 +300,6 @@ public class BooksDbImpl implements BooksDbInterface {
         ResultSet rs = null;
         PreparedStatement statement = null;
         try {
-
             statement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
@@ -322,7 +314,6 @@ public class BooksDbImpl implements BooksDbInterface {
                         rs.getInt("Rating"), rs.getDate("Published"));
                 result.add(book);
             }
-            System.out.println(result);
             statement.clearParameters();
             for (int i = 0; i < result.size(); i++){
                 statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
@@ -350,22 +341,16 @@ public class BooksDbImpl implements BooksDbInterface {
                 }
             }
             return result;
-
         } catch (SQLException e) {
-            try {
-                throw e;
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            throw new BooksDbException(e.getSQLState());
         } finally {
             try {
                 statement.close();
                 rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException | NullPointerException e) {
+                throw new BooksDbException("Not logged in");
             }
         }
-        return result;
     }
 
     /**
@@ -393,7 +378,6 @@ public class BooksDbImpl implements BooksDbInterface {
                 tmpID1.add(rs.getString("ISBN"));
             }
 
-            System.out.println(tmpID1);
 
             for (int i = 0; i < tmpID1.size() ; i++) {
                 statement = connection.prepareStatement("SELECT * FROM Book " +
@@ -411,7 +395,6 @@ public class BooksDbImpl implements BooksDbInterface {
                     result.add(book);
                 }
             }
-            System.out.println(result);
             statement.clearParameters();
             for (int i = 0; i < result.size(); i++){
                 statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
@@ -440,20 +423,15 @@ public class BooksDbImpl implements BooksDbInterface {
             }
             return result;
         } catch (SQLException e) {
-            try {
-                throw e;
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            throw new BooksDbException(e.getSQLState());
         } finally {
             try {
                 statement.close();
                 rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException | NullPointerException e) {
+                throw new BooksDbException("Not logged in");
             }
         }
-        return result;
     }
 
     /**
@@ -483,7 +461,6 @@ public class BooksDbImpl implements BooksDbInterface {
                         rs.getInt("Rating"), rs.getDate("Published"));
                 result.add(book);
             }
-            System.out.println(result);
             statement.clearParameters();
             for (int i = 0; i < result.size(); i++){
                 statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
@@ -512,20 +489,15 @@ public class BooksDbImpl implements BooksDbInterface {
             }
             return result;
         } catch (SQLException e) {
-            try {
-                throw e;
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            throw new BooksDbException(e.getSQLState());
         } finally {
             try {
                 statement.close();
                 rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException | NullPointerException e) {
+                throw new BooksDbException("Not logged in");
             }
         }
-        return result;
     }
 
     /**
@@ -555,24 +527,23 @@ public class BooksDbImpl implements BooksDbInterface {
                         rs.getInt("Rating"), rs.getDate("Published"));
                 result.add(book);
             }
-            System.out.println(result);
             statement.clearParameters();
-            for (int i = 0; i < result.size(); i++){
+            for (int i = 0; i < result.size(); i++) {
                 statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
                         "WHERE isbn = " +
                         result.get(i).getIsbn());
                 rs = statement.executeQuery();
                 ArrayList<Integer> tmpID = new ArrayList<Integer>();
-                while(rs.next()){
+                while (rs.next()) {
                     tmpID.add(rs.getInt("AuthorID"));
                 }
                 statement.clearParameters();
 
-                for (int j = 0; j < tmpID.size(); j++){
+                for (int j = 0; j < tmpID.size(); j++) {
                     statement = connection.prepareStatement("SELECT * FROM Author " +
                             "WHERE authorId = " + tmpID.get(j));
                     rs = statement.executeQuery();
-                    while (rs.next()){
+                    while (rs.next()) {
                         Author author = new Author(
                                 rs.getString("Name"),
                                 rs.getDate("dateOfBirth"),
@@ -583,21 +554,15 @@ public class BooksDbImpl implements BooksDbInterface {
                 }
             }
             return result;
-
         } catch (SQLException e) {
-            try {
-                throw e;
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            throw new BooksDbException(e.getSQLState());
         } finally {
             try {
                 statement.close();
                 rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException | NullPointerException e) {
+                throw new BooksDbException("Not logged in");
             }
         }
-        return result;
     }
 }

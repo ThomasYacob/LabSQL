@@ -2,6 +2,7 @@ package com.redvethomas.labsql.Controller;
 
 import com.redvethomas.labsql.Model.*;
 import com.redvethomas.labsql.View.BooksPane;
+import javafx.application.Platform;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,22 +35,44 @@ public class Controller {
      * This is a method that connects to the database
      */
     public void connectDatabase(User user) {
-        try {
-            booksDb.connect("BooksDB", user);
-        } catch (BooksDbException e) {
-            e.printStackTrace();
-        };
+        new Thread() {
+            public void run() {
+                try {
+                    booksDb.connect("BooksDB", user);
+                } catch (BooksDbException e) {
+                    javafx.application.Platform.runLater(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    booksView.showAlertAndWait("Couldn't connect to the database", ERROR);
+                                }
+                            }
+                    );
+                }
+            }
+        }.start();
     }
 
     /**
      * This is a method that disconnects the database
      */
     public void disconnectDatabase() {
-        try {
-            booksDb.disconnect();
-        } catch (BooksDbException e) {
-            e.printStackTrace();
-        }
+        new Thread() {
+            public void run() {
+                try {
+                    booksDb.disconnect();
+                } catch (BooksDbException e) {
+                    javafx.application.Platform.runLater(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    booksView.showAlertAndWait("Couldn't disconnect from the database", ERROR);
+                                }
+                            }
+                    );
+                }
+            }
+        }.start();
     }
 
     /**
@@ -57,11 +80,22 @@ public class Controller {
      * @param isbn the isbn string
      */
     public void bookRemoval(String isbn) {
-        try {
-            booksDb.removeBook(isbn);
-        } catch (BooksDbException | SQLException e) {
-            booksView.showAlertAndWait("Book not found",ERROR);
-        }
+        new Thread() {
+            public void run() {
+                try {
+                    booksDb.removeBook(isbn);
+                } catch (BooksDbException | SQLException e) {
+                    javafx.application.Platform.runLater(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    booksView.showAlertAndWait("Book not found", ERROR);
+                                }
+                            }
+                    );
+                }
+            }
+        }.start();
     }
 
     /**
@@ -78,12 +112,7 @@ public class Controller {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    try {
-                                        throw new BooksDbException("1", e);
-                                    } catch (BooksDbException e) {
-                                        e.printStackTrace();
-                                    }
-                                    booksView.showAlertAndWait("2", ERROR);
+                                    booksView.showAlertAndWait("No permission to add a book", ERROR);
                                 }
                             }
                     );
@@ -107,7 +136,7 @@ public class Controller {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    booksView.showAlertAndWait("1", ERROR);
+                                    booksView.showAlertAndWait("No permission to add an author", ERROR);
                                 }
                             }
                     );
@@ -131,16 +160,16 @@ public class Controller {
                             public void run() {
                                 try {
                                     List<Book> result = booksDb.searchBooksByTitle(searchFor);
-                                    javafx.application.Platform.runLater(
+                                    booksView.displayBooks(result);
+                                } catch (BooksDbException | NullPointerException e) {
+                                    Platform.runLater(
                                             new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    booksView.displayBooks(result);
+                                                    booksView.showAlertAndWait(e.getLocalizedMessage(), ERROR);
                                                 }
                                             }
                                     );
-                                } catch (BooksDbException e) {
-                                    booksView.showAlertAndWait("", ERROR);
                                 }
                             }
                         }.start();
@@ -150,16 +179,16 @@ public class Controller {
                             public void run() {
                                 try {
                                     List<Book> result = booksDb.searchBooksByIsbn(searchFor);
+                                    booksView.displayBooks(result);
+                                } catch (BooksDbException | NullPointerException e) {
                                     javafx.application.Platform.runLater(
                                             new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    booksView.displayBooks(result);
+                                                    booksView.showAlertAndWait(e.getLocalizedMessage(), ERROR);
                                                 }
                                             }
                                     );
-                                } catch (BooksDbException e) {
-                                    booksView.showAlertAndWait("", ERROR);
                                 }
                             }
                         }.start();
@@ -169,16 +198,16 @@ public class Controller {
                             public void run() {
                                 try {
                                     List<Book> result = booksDb.searchBooksByAuthor(searchFor);
+                                    booksView.displayBooks(result);
+                                } catch (BooksDbException | NullPointerException e) {
                                     javafx.application.Platform.runLater(
                                             new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    booksView.displayBooks(result);
+                                                    booksView.showAlertAndWait(e.getLocalizedMessage(), ERROR);
                                                 }
                                             }
                                     );
-                                } catch (BooksDbException e) {
-                                    booksView.showAlertAndWait("", ERROR);
                                 }
                             }
                         }.start();
@@ -188,16 +217,16 @@ public class Controller {
                             public void run() {
                                 try {
                                     List<Book> result = booksDb.searchBooksByRating(Integer.parseInt(searchFor));
+                                    booksView.displayBooks(result);
+                                } catch (BooksDbException | NullPointerException e) {
                                     javafx.application.Platform.runLater(
                                             new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    booksView.displayBooks(result);
+                                                    booksView.showAlertAndWait(e.getLocalizedMessage(), ERROR);
                                                 }
                                             }
                                     );
-                                } catch (BooksDbException e) {
-                                    booksView.showAlertAndWait("", ERROR);
                                 }
                             }
                         }.start();
@@ -207,16 +236,16 @@ public class Controller {
                             public void run() {
                                 try {
                                     List<Book> result = booksDb.searchBooksByGenre(searchFor);
+                                    booksView.displayBooks(result);
+                                } catch (BooksDbException | NullPointerException e) {
                                     javafx.application.Platform.runLater(
                                             new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    booksView.displayBooks(result);
+                                                    booksView.showAlertAndWait(e.getLocalizedMessage(), ERROR);
                                                 }
                                             }
                                     );
-                                } catch (BooksDbException e) {
-                                    booksView.showAlertAndWait("", ERROR);
                                 }
                             }
                         }.start();
@@ -232,6 +261,4 @@ public class Controller {
         }
     }
 
-    // TODO:
-    // Add methods for all types of user interaction (e.g. via  menus).
 }
