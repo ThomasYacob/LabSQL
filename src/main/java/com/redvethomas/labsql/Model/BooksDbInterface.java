@@ -17,13 +17,13 @@ import java.util.List;
  * @author anderslm@kth.se
  */
 public interface BooksDbInterface {
-    
+
     /**
-     * Connect to the database.
-     * @param database
-     * @return true on successful connection.
+     *
+     * @return
+     * @throws BooksDbException
      */
-    public boolean connect(String database) throws BooksDbException;
+    public boolean connect(String database, User user) throws BooksDbException;
     public void disconnect() throws BooksDbException;
     public void addBook(Book book) throws BooksDbException, SQLException;
     public void addAuthor(Author author, String isbn) throws BooksDbException, SQLException;

@@ -35,12 +35,10 @@ public class BooksDbImpl implements BooksDbInterface {
      * @throws BooksDbException
      */
         @Override
-        public boolean connect(String database) throws BooksDbException {
-            String username = "root";
-            String password = "godzhell1";
+        public boolean connect(String database, User user) throws BooksDbException {
             String url = "jdbc:mysql://localhost:3306/" + database + "?UseClientEnc=UTF8";
             try {
-                connection = DriverManager.getConnection(url, username, password);
+                connection = DriverManager.getConnection(url, user.getUsername(), user.getPassword());
                 System.out.println("Connected!");
                 return true;
             } catch (SQLException e) {

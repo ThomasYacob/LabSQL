@@ -45,6 +45,7 @@ public class BooksPane extends VBox {
     private BookDialog bookDialog = new BookDialog();
     private IsbnDialog isbnDialog = new IsbnDialog();
     private AuthorDialog authorDialog = new AuthorDialog();
+    private UserDialog userDialog = new UserDialog();
 
     private MenuBar menuBar;
 
@@ -164,7 +165,9 @@ public class BooksPane extends VBox {
         EventHandler<ActionEvent> connectHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                controller.connectDatabase();
+                Optional<User> result = userDialog.showAndWait();
+                User user = result.get();
+                controller.connectDatabase(user);
             }
         };
         connectItem.addEventHandler(ActionEvent.ACTION, connectHandler);
@@ -177,13 +180,8 @@ public class BooksPane extends VBox {
             }
         };
         disconnectItem.addEventHandler(ActionEvent.ACTION, disconnectHandler);
-        fileMenu.getItems().addAll(exitItem, connectItem, disconnectItem);
 
-//        Menu searchMenu = new Menu("Search");
-//        MenuItem titleItem = new MenuItem("Title");
-//        MenuItem isbnItem = new MenuItem("ISBN");
-//        MenuItem authorItem = new MenuItem("Author");
-//        searchMenu.getItems().addAll(titleItem, isbnItem, authorItem);
+        fileMenu.getItems().addAll(exitItem, connectItem, disconnectItem);
 
         Menu manageMenu = new Menu("Manage");
         MenuItem addBookItem = new MenuItem("Add Book");
@@ -193,7 +191,6 @@ public class BooksPane extends VBox {
                     Optional<Book> result = bookDialog.showAndWait();
                     Book book = result.get();
                     controller.addBook(book);
-
                 }
         };
         addBookItem.addEventHandler(ActionEvent.ACTION, addHandler);
@@ -223,8 +220,7 @@ public class BooksPane extends VBox {
         };
         removeItem.addEventHandler(ActionEvent.ACTION, addRemoveHandler);
 
-        MenuItem updateItem = new MenuItem("Update");
-        manageMenu.getItems().addAll(addBookItem, addAuthorItem, removeItem, updateItem);
+        manageMenu.getItems().addAll(addBookItem, addAuthorItem, removeItem);
 
         menuBar = new MenuBar();
         menuBar.getMenus().addAll(fileMenu, manageMenu);

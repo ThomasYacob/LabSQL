@@ -1,6 +1,6 @@
 package com.redvethomas.labsql.View;
 
-import com.redvethomas.labsql.Model.Author;
+import com.redvethomas.labsql.Model.User;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -10,29 +10,26 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 
-import static java.sql.Date.valueOf;
-
 
 /**
  * A simplified example of a form, using JavaFX Dialog and DialogPane. Type
  * parameterized for Book.
  *
- * @authors Thomas Yacob &, Redve Ahmed
+ * @authors Thomas Yacob & Redve Ahmed
  */
 
-public class AuthorDialog extends Dialog<Author>{
+public class UserDialog extends Dialog<User>{
 
-    private final TextField authorNameField = new TextField();
-    private final DatePicker dateOfBirthField = new DatePicker();
-    private final TextField authorIDField = new TextField();
+    private final TextField usernameField = new TextField();
+    private final PasswordField passwordField = new PasswordField();
 
-    public AuthorDialog(){
-        buildAddAuthorDialog();
+    public UserDialog(){
+        buildAddUserDialog();
     }
 
-    private void buildAddAuthorDialog(){
+    private void buildAddUserDialog(){
 
-        this.setTitle("Add a new Author");
+        this.setTitle("User");
         this.setResizable(false);
 
         GridPane grid = new GridPane();
@@ -40,12 +37,10 @@ public class AuthorDialog extends Dialog<Author>{
         grid.setHgap(5);
         grid.setVgap(5);
         grid.setPadding(new Insets(10, 10, 10, 10));
-        grid.add(new Label("Author name "), 1, 1);
-        grid.add(authorNameField, 2, 1);
-        grid.add(new Label("Date of birth"), 1, 2);
-        grid.add(dateOfBirthField, 2, 2);
-//        grid.add(new Label("AuthorID "), 1, 3);
-//        grid.add(authorIDField, 2, 3);
+        grid.add(new Label("Username "), 1, 1);
+        grid.add(usernameField, 2, 1);
+        grid.add(new Label("Password"), 1, 2);
+        grid.add(passwordField, 2, 2);
 
         this.getDialogPane().setContent(grid);
 
@@ -56,19 +51,25 @@ public class AuthorDialog extends Dialog<Author>{
                 = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
         this.getDialogPane().getButtonTypes().add(buttonTypeCancel);
 
+        ButtonType guestField = new ButtonType("Guest", ButtonBar.ButtonData.APPLY);
+        this.getDialogPane().getButtonTypes().add(guestField);
         // this callback returns the result from our dialog, via
         // Optional<FooBook> result = dialog.showAndWait();
-        // FooBook book = result.get();
+        // FooBook user = result.get();
         // see DialogExample, line 31-34
-        this.setResultConverter(new Callback<ButtonType, Author>() {
+        this.setResultConverter(new Callback<ButtonType, User>() {
             @Override
-            public Author call(ButtonType b) {
-                Author result = null;
+            public User call(ButtonType b) {
+                User result = null;
                 if (b == buttonTypeOk) {
                     if (isValidData()) {
-                        result = new Author(
-                                authorNameField.getText(),
-                                valueOf(dateOfBirthField.getValue()));
+                        result = new User(
+                                usernameField.getText(),
+                                passwordField.getText());
+                    }
+                    else if(b == guestField) {
+                        result = new User("Guest", "Password1!");
+
                     }
                 }
 
@@ -93,14 +94,10 @@ public class AuthorDialog extends Dialog<Author>{
     }
 
     private boolean isValidData() {
-        if (authorIDField.getText() == null) {
+        if (usernameField.getText() == null) {
             return false;
         }
-        if (authorNameField.getText().isEmpty()) {
-            System.out.println(authorNameField.getText());
-            return false;
-        }
-        if(dateOfBirthField.getValue() == null) {
+        if (passwordField.getText().isEmpty()) {
             return false;
         }
         // if(...) - keep on validating user input...
@@ -109,8 +106,8 @@ public class AuthorDialog extends Dialog<Author>{
     }
 
     private void clearFormData() {
-        authorIDField.setText("");
-        authorNameField.setText("");
+        usernameField.setText("");
+        passwordField.setText("");
     }
 
     private final Alert errorAlert = new Alert(Alert.AlertType.ERROR);

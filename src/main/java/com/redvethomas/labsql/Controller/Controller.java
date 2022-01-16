@@ -33,9 +33,9 @@ public class Controller {
     /**
      * This is a method that connects to the database
      */
-    public void connectDatabase() {
+    public void connectDatabase(User user) {
         try {
-            booksDb.connect("BooksDB");
+            booksDb.connect("BooksDB", user);
         } catch (BooksDbException e) {
             e.printStackTrace();
         };
