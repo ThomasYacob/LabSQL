@@ -122,7 +122,7 @@ public class BooksPane extends VBox {
         authorCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.13));
         genreCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.15));
         reviewCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.23));
-        addedByCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.08));
+        addedByCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.11));
 
         // define how to fill data for each cell, 
         // get values from Book properties
