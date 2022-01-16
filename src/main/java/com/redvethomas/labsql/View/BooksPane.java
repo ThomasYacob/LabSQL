@@ -46,6 +46,7 @@ public class BooksPane extends VBox {
     private IsbnDialog isbnDialog = new IsbnDialog();
     private AuthorDialog authorDialog = new AuthorDialog();
     private UserDialog userDialog = new UserDialog();
+    private ReviewDialog reviewDialog = new ReviewDialog();
 
     private MenuBar menuBar;
 
@@ -111,10 +112,17 @@ public class BooksPane extends VBox {
         TableColumn<Book, Date> publishedCol = new TableColumn<>("Published");
         TableColumn<Book, String> authorCol = new TableColumn<>("Authors");
         TableColumn<Book, String> genreCol = new TableColumn<>("Genre");
-        TableColumn<Book, Integer> ratingCol = new TableColumn<>("Rating");
-        booksTable.getColumns().addAll(titleCol, isbnCol, publishedCol, authorCol, genreCol, ratingCol);
+        TableColumn<Book, Review> reviewCol = new TableColumn<>("Review");
+        TableColumn<Book, String> addedByCol = new TableColumn<>("addedBy");
+        booksTable.getColumns().addAll(titleCol, isbnCol, publishedCol, authorCol, genreCol, reviewCol, addedByCol);
         // give title column some extra space
-//        titleCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.5));
+        titleCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.14));
+        isbnCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.14));
+        publishedCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.10));
+        authorCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.13));
+        genreCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.15));
+        reviewCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.23));
+        addedByCol.prefWidthProperty().bind(booksTable.widthProperty().multiply(0.08));
 
         // define how to fill data for each cell, 
         // get values from Book properties
@@ -123,7 +131,8 @@ public class BooksPane extends VBox {
         publishedCol.setCellValueFactory(new PropertyValueFactory<>("published"));
         authorCol.setCellValueFactory(new PropertyValueFactory<>("authorName"));
         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
-        ratingCol.setCellValueFactory(new PropertyValueFactory<>("rating"));
+        reviewCol.setCellValueFactory(new PropertyValueFactory<>("reviews"));
+        addedByCol.setCellValueFactory(new PropertyValueFactory<>("user"));
 
         // associate the table view with the data
         booksTable.setItems(booksInTable);
@@ -208,6 +217,18 @@ public class BooksPane extends VBox {
         };
         addAuthorItem.addEventHandler(ActionEvent.ACTION, addAuthorHandler);
 
+        MenuItem reviewItem = new MenuItem("Review a book");
+        EventHandler<ActionEvent> reviewHandler = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Optional<String> resultIsbn = isbnDialog.showAndWait();
+                String isbn = resultIsbn.get();
+                Optional<Review> result = reviewDialog.showAndWait() ;
+                Review review = result.get();
+                controller.addReview(review, isbn);
+            }
+        };
+        reviewItem.addEventHandler(ActionEvent.ACTION, reviewHandler);
 
         MenuItem removeItem = new MenuItem("Remove");
         EventHandler<ActionEvent> addRemoveHandler = new EventHandler<ActionEvent>() {
@@ -220,7 +241,7 @@ public class BooksPane extends VBox {
         };
         removeItem.addEventHandler(ActionEvent.ACTION, addRemoveHandler);
 
-        manageMenu.getItems().addAll(addBookItem, addAuthorItem, removeItem);
+        manageMenu.getItems().addAll(addBookItem, addAuthorItem, reviewItem, removeItem);
 
         menuBar = new MenuBar();
         menuBar.getMenus().addAll(fileMenu, manageMenu);

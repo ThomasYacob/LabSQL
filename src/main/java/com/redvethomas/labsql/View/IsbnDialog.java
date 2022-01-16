@@ -18,7 +18,7 @@ import static java.sql.Date.valueOf;
  * A simplified example of a form, using JavaFX Dialog and DialogPane. Type
  * parameterized for Book.
  *
- * @author Anders Lindström, anderslm@kth.se
+ * @author Redve Ahmed & Thomas Yacob
  */
 public class IsbnDialog extends Dialog<String> {
 
@@ -31,7 +31,7 @@ public class IsbnDialog extends Dialog<String> {
 
     private void buildIsbnDialog() {
 
-        this.setTitle("Add a new book");
+        this.setTitle("ISBN of the book");
         this.setResizable(false); // really?
 
         GridPane grid = new GridPane();
@@ -89,9 +89,7 @@ public class IsbnDialog extends Dialog<String> {
     // TODO for the student: check each input separately, to give better
     // feedback to the user
     private boolean isValidData() {
-
         if (!Book.isValidIsbn(isbnField.getText())) {
-            System.out.println(isbnField.getText());
             return false;
         }
         // if(...) - keep on validating user input...

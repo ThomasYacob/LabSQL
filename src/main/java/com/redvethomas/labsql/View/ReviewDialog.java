@@ -1,8 +1,7 @@
 package com.redvethomas.labsql.View;
 
-
-import com.redvethomas.labsql.Model.Author;
 import com.redvethomas.labsql.Model.Book;
+import com.redvethomas.labsql.Model.Review;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -21,24 +20,19 @@ import static java.sql.Date.valueOf;
  *
  * @author Redve Ahmed & Thomas Yacob
  */
-public class BookDialog extends Dialog<Book> {
+public class ReviewDialog extends Dialog<Review> {
 
-    private final TextField isbnField = new TextField();
-    private final TextField titleField = new TextField();
-    private final ComboBox<Book.Genre> genreChoice = new ComboBox(FXCollections
-            .observableArrayList(Book.Genre.values()));
-    private final DatePicker publishedField = new DatePicker();
-    private final TextField authorNameField = new TextField();
-    private final DatePicker dateOfBirthField = new DatePicker();
+    private final ComboBox<Integer> ratingField = new ComboBox<>(FXCollections.observableArrayList(1, 2, 3, 4, 5));
+    private final TextField reviewField = new TextField();
+    private final DatePicker reviewDateField = new DatePicker();
 
-
-    public BookDialog() {
-        buildBookDialog();
+    public ReviewDialog() {
+        buildReviewDialog();
     }
 
-    private void buildBookDialog() {
+    private void buildReviewDialog() {
 
-        this.setTitle("Add a new book");
+        this.setTitle("Add a new review");
         this.setResizable(false); // really?
 
         GridPane grid = new GridPane();
@@ -46,18 +40,12 @@ public class BookDialog extends Dialog<Book> {
         grid.setHgap(5);
         grid.setVgap(5);
         grid.setPadding(new Insets(10, 10, 10, 10));
-        grid.add(new Label("Isbn "), 1, 1);
-        grid.add(isbnField, 2, 1);
-        grid.add(new Label("Title "), 1, 2);
-        grid.add(titleField, 2, 2);
-        grid.add(new Label("Published "), 1, 3);
-        grid.add(publishedField, 2, 3);
-        grid.add(new Label("Genre "), 1, 4);
-        grid.add(genreChoice, 2, 4);
-        grid.add(new Label("Author Name"), 1, 6);
-        grid.add(authorNameField, 2, 6);
-        grid.add(new Label("Date of Birth"), 1, 7);
-        grid.add(dateOfBirthField, 2, 7);
+        grid.add(new Label("Rating"), 1, 1);
+        grid.add(ratingField, 2, 1);
+        grid.add(new Label("Review"), 1, 2);
+        grid.add(reviewField, 2, 2);
+        grid.add(new Label("Review Date"), 1, 3);
+        grid.add(reviewDateField, 2, 3);
 
         this.getDialogPane().setContent(grid);
 
@@ -69,26 +57,20 @@ public class BookDialog extends Dialog<Book> {
         this.getDialogPane().getButtonTypes().add(buttonTypeCancel);
 
         // this callback returns the result from our dialog, via
-        // Optional<Book> result = dialog.showAndWait();
+        // Optional<Review> result = dialog.showAndWait();
         // Book book = result.get();
         // see DialogExample, line 31-34
-        this.setResultConverter(new Callback<ButtonType, Book>() {
+        this.setResultConverter(new Callback<ButtonType, Review>() {
             @Override
-            public Book call(ButtonType b) {
+            public Review call(ButtonType b) {
                 int tmp;
-                Book result = null;
+                Review result = null;
                 if (b == buttonTypeOk) {
                     if (isValidData()) {
-                        result = new Book(
-                                isbnField.getText(),
-                                titleField.getText(),
-                                genreChoice.getValue(),
-                                valueOf(publishedField.getValue()));
-
-                        Author temp = new Author(authorNameField.getText(),
-                                valueOf(dateOfBirthField.getValue()));
-                                result.addAuthor(temp);
-                        System.out.println(result.toString());
+                        result = new Review(
+                                ratingField.getValue(),
+                                reviewField.getText(),
+                                valueOf(reviewDateField.getValue()));
                     }
                 }
                 clearFormData();
@@ -114,10 +96,7 @@ public class BookDialog extends Dialog<Book> {
     // TODO for the student: check each input separately, to give better
     // feedback to the user
     private boolean isValidData() {
-        if (genreChoice.getValue() == null) {
-            return false;
-        }
-        if (!Book.isValidIsbn(isbnField.getText())) {
+        if(reviewDateField.getValue() == null) {
             return false;
         }
         // if(...) - keep on validating user input...
@@ -126,9 +105,7 @@ public class BookDialog extends Dialog<Book> {
     }
 
     private void clearFormData() {
-        titleField.setText("");
-        isbnField.setText("");
-        genreChoice.setValue(null);
+        reviewField.setText("");
     }
 
     private final Alert errorAlert = new Alert(Alert.AlertType.ERROR);

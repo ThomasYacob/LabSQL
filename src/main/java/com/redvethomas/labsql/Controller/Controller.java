@@ -44,7 +44,7 @@ public class Controller {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    booksView.showAlertAndWait("Couldn't connect to the database", ERROR);
+                                    booksView.showAlertAndWait(e.getLocalizedMessage(), ERROR);
                                 }
                             }
                     );
@@ -66,7 +66,7 @@ public class Controller {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    booksView.showAlertAndWait("Couldn't disconnect from the database", ERROR);
+                                    booksView.showAlertAndWait(e.getLocalizedMessage(), ERROR);
                                 }
                             }
                     );
@@ -137,6 +137,30 @@ public class Controller {
                                 @Override
                                 public void run() {
                                     booksView.showAlertAndWait("No permission to add an author", ERROR);
+                                }
+                            }
+                    );
+                }
+            }
+        }.start();
+    }
+
+    /**
+     * This is a method that adds a review to a book
+     * @param review the review object
+     * @param isbn the isbn string to connect to the book object
+     */
+    public void addReview(Review review, String isbn) {
+        new Thread() {
+            public void run() {
+                try {
+                    booksDb.addReview(review, isbn);
+                } catch (BooksDbException | SQLException e) {
+                    javafx.application.Platform.runLater(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    booksView.showAlertAndWait("No permission to add a review", ERROR);
                                 }
                             }
                     );

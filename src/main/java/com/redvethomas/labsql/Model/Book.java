@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 /**
  * Representation of a book.
  * 
- * @author anderslm@kth.se
+ * @author Redve Ahmed & Thomas Yacob
  */
 public class Book {
 
@@ -21,44 +21,42 @@ public class Book {
     private final Date published;
     private String storyLine = "";
     private Genre genre;
-    private int rating;
     private ArrayList<Author> authors;
-    private String authorName;
+    private ArrayList<Review> reviews;
+    private User user;
 
     /**
      * This is a constructor for the book object
      * @param isbn
      * @param title
      * @param genre
-     * @param rating
      * @param published
      * @param authorName
      * @param authorId
      * @param dateOfBirth
      */
-    public Book(String isbn, String title, Genre genre, int rating, Date published, String authorName, int authorId, Date dateOfBirth) {
+    public Book(String isbn, String title, Genre genre, Date published, String authorName, int authorId, Date dateOfBirth, String username) {
         if(!isValidIsbn(isbn)) {
             throw new IllegalArgumentException("Invalid isbn");
         }
         this.isbn = isbn;
         this.title = title;
         this.genre = genre;
-        this.rating = rating;
         this.published = published;
-        this.authorName = authorName;
         this.authors = new ArrayList<>();
-        authors.add(new Author(authorName, dateOfBirth, authorId));
+        this.reviews = new ArrayList<>();
+        authors.add(new Author(authorName, dateOfBirth, authorId, username));
     }
 
-    public Book(String isbn, String title, Genre genre, int rating, Date published) {
+    public Book(String isbn, String title, Genre genre, Date published) {
         if(!isValidIsbn(isbn)) {
             throw new IllegalArgumentException("Invalid isbn");
         }
         this.isbn = isbn;
         this.title = title;
         this.genre = genre;
-        this.rating = rating;
         this.published = published;
+        this.reviews = new ArrayList<>();
         this.authors = new ArrayList<>();
     }
 
@@ -67,6 +65,9 @@ public class Book {
         return isbnPattern.matcher(isbn).matches();
     }
 
+    public void addReview(Review review) {
+        reviews.add(review);
+    }
     public void addAuthor(Author author) {
         authors.add(author);
     }
@@ -75,41 +76,31 @@ public class Book {
         return authors.remove(author);
     }
 
+    public ArrayList<Review> getReviews() {
+        return (ArrayList<Review>) reviews.clone();
+    }
+
     public ArrayList<Author> getAuthors() {
         return this.authors;
     }
 
-    public String getAuthorName(){
-        StringBuilder stringBuilder = new StringBuilder();
-        for(int i = 0; i < authors.size(); i++){
-            stringBuilder.append(authors.get(i).getAuthorName());
-            stringBuilder.append(", ");
-        }
-        stringBuilder.deleteCharAt(stringBuilder.length()-1);
-        return stringBuilder.toString();
-    }
     public Genre getGenre() {
         return genre;
     }
     public String getIsbn() { return isbn; }
     public String getTitle() { return title; }
     public Date getPublished() { return published; }
-    public String getStoryLine() { return storyLine; }
-    public int getRating() {
-        return rating;
-    }
 
-    public void setStoryLine(String storyLine) {
-        this.storyLine = storyLine;
+    public void setUser(User user){
+        this.user = user;
     }
-
-    public void setRating(int rating) {
-        this.rating = rating;
+    public User getUser(){
+        return this.user;
     }
 
     @Override
     public String toString() {
-        return isbn + " " + title + ", " + genre + ", " + getRating() + " " + published.toString()
-                + " " + getAuthors();
+        return isbn + " " + title + ", " + genre + ", " + " " + published.toString()
+                + " " + authors;
     }
 }

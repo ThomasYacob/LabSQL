@@ -17,7 +17,7 @@ import static java.sql.Date.valueOf;
  * A simplified example of a form, using JavaFX Dialog and DialogPane. Type
  * parameterized for Book.
  *
- * @authors Thomas Yacob &, Redve Ahmed
+ * @authors Thomas Yacob & Redve Ahmed
  */
 
 public class AuthorDialog extends Dialog<Author>{
@@ -44,8 +44,6 @@ public class AuthorDialog extends Dialog<Author>{
         grid.add(authorNameField, 2, 1);
         grid.add(new Label("Date of birth"), 1, 2);
         grid.add(dateOfBirthField, 2, 2);
-//        grid.add(new Label("AuthorID "), 1, 3);
-//        grid.add(authorIDField, 2, 3);
 
         this.getDialogPane().setContent(grid);
 
@@ -58,7 +56,7 @@ public class AuthorDialog extends Dialog<Author>{
 
         // this callback returns the result from our dialog, via
         // Optional<FooBook> result = dialog.showAndWait();
-        // FooBook book = result.get();
+        // FooBook author = result.get();
         // see DialogExample, line 31-34
         this.setResultConverter(new Callback<ButtonType, Author>() {
             @Override
@@ -93,11 +91,7 @@ public class AuthorDialog extends Dialog<Author>{
     }
 
     private boolean isValidData() {
-        if (authorIDField.getText() == null) {
-            return false;
-        }
         if (authorNameField.getText().isEmpty()) {
-            System.out.println(authorNameField.getText());
             return false;
         }
         if(dateOfBirthField.getValue() == null) {
@@ -109,7 +103,6 @@ public class AuthorDialog extends Dialog<Author>{
     }
 
     private void clearFormData() {
-        authorIDField.setText("");
         authorNameField.setText("");
     }
 

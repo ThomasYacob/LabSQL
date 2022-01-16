@@ -14,19 +14,15 @@ import java.util.List;
  * exception. This way the interface is the same for both implementations, because the
  * exception type in the method signatures is the same. More info in BooksDbException.java.
  * 
- * @author anderslm@kth.se
+ * @author Redve Ahmed & Thomas Yacob
  */
 public interface BooksDbInterface {
 
-    /**
-     *
-     * @return
-     * @throws BooksDbException
-     */
     public boolean connect(String database, User user) throws BooksDbException;
     public void disconnect() throws BooksDbException;
     public void addBook(Book book) throws BooksDbException, SQLException;
     public void addAuthor(Author author, String isbn) throws BooksDbException, SQLException;
+    public void addReview(Review review, String isbn) throws BooksDbException, SQLException;
     public void removeBook(String isbnSearch) throws BooksDbException, SQLException;
 
     public List<Book> searchBooksByTitle(String searchTitle) throws BooksDbException;
