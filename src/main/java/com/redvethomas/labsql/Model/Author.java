@@ -110,10 +110,7 @@ public class Author {
 
     @Override
     public String toString() {
-        return "Author{" +
-                "name='" + authorName + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", authorId='" + authorId + '\'' +
-                '}';
+        return "name: " + authorName +
+                "(User: " + user.getUsername() + ")" + "\n";
     }
 }

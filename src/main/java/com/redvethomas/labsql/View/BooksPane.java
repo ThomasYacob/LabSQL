@@ -129,7 +129,7 @@ public class BooksPane extends VBox {
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         isbnCol.setCellValueFactory(new PropertyValueFactory<>("isbn"));
         publishedCol.setCellValueFactory(new PropertyValueFactory<>("published"));
-        authorCol.setCellValueFactory(new PropertyValueFactory<>("authorName"));
+        authorCol.setCellValueFactory(new PropertyValueFactory<>("authors"));
         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
         reviewCol.setCellValueFactory(new PropertyValueFactory<>("reviews"));
         addedByCol.setCellValueFactory(new PropertyValueFactory<>("user"));

@@ -60,6 +60,19 @@ public class Book {
         this.authors = new ArrayList<>();
     }
 
+    public Book(String isbn, String title, Genre genre, Date published, String username) {
+        if(!isValidIsbn(isbn)) {
+            throw new IllegalArgumentException("Invalid isbn");
+        }
+        this.isbn = isbn;
+        this.title = title;
+        this.genre = genre;
+        this.published = published;
+        this.user = new User(username);
+        this.reviews = new ArrayList<>();
+        this.authors = new ArrayList<>();
+    }
+
     private static final Pattern isbnPattern = Pattern.compile("^[- ]?[0-9]{13}$");
     public static boolean isValidIsbn(String isbn) {
         return isbnPattern.matcher(isbn).matches();

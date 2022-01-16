@@ -88,7 +88,6 @@ public class BookDialog extends Dialog<Book> {
                         Author temp = new Author(authorNameField.getText(),
                                 valueOf(dateOfBirthField.getValue()));
                                 result.addAuthor(temp);
-                        System.out.println(result.toString());
                     }
                 }
                 clearFormData();
