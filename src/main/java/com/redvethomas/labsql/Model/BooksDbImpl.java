@@ -75,45 +75,53 @@ public class BooksDbImpl implements BooksDbInterface {
      *
      * @param book The book object that is added
      * @throws BooksDbException if the book is not added successfully, a BooksDbException is thrown
-     * @throws SQLException     Throws a SQLException if error occurs
+     * @throws SQLException Throws a SQLException if error occurs
      */
     @Override
     public void addBook(Book book) throws BooksDbException, SQLException {
         if (book == null) {
             throw new BooksDbException("");
         }
-        PreparedStatement statement = null;
+        PreparedStatement bookStatement = null;
+        PreparedStatement genreStatement = null;
+        PreparedStatement authorStatement = null;
+        PreparedStatement bookAuthorStatement = null;
         try {
             connection.setAutoCommit(false);
             book.setUser(currentUser);
 
-            statement = connection.prepareStatement("INSERT INTO Book(isbn, addedBy, title, published) VALUES(?, ?, ?, ?)");
-            statement.setString(1, book.getIsbn());
-            statement.setString(2, book.getUser().getUsername());
-            statement.setString(3, book.getTitle());
-            statement.setDate(4, Date.valueOf(String.valueOf(book.getPublished())));
-            statement.executeUpdate();
+            bookStatement = connection.prepareStatement("INSERT INTO Book(isbn, addedBy, title, published) VALUES(?, ?, ?, ?)");
+            bookStatement.setString(1, book.getIsbn());
+            bookStatement.setString(2, book.getUser().getUsername());
+            bookStatement.setString(3, book.getTitle());
+            bookStatement.setDate(4, Date.valueOf(String.valueOf(book.getPublished())));
+            bookStatement.executeUpdate();
+            bookStatement.clearParameters();
 
-            statement = connection.prepareStatement("INSERT INTO Genre VALUES(?, ?)");
-            statement.setString(1, book.getGenre().toString());
-            statement.setString(2, book.getIsbn());
-            statement.executeUpdate();
+            genreStatement = connection.prepareStatement("INSERT INTO Genre VALUES(?, ?)");
+            genreStatement.setString(1, book.getGenre().toString());
+            genreStatement.setString(2, book.getIsbn());
+            genreStatement.executeUpdate();
+            genreStatement.clearParameters();
 
-            statement = connection.prepareStatement("INSERT INTO Author (addedBy, name, dateofbirth) VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, book.getUser().getUsername());
-            statement.setString(2, book.getAuthors().get(0).getAuthorName());
-            statement.setDate(3, Date.valueOf(String.valueOf(book.getAuthors().get(0).getDateOfBirth())));
-            statement.executeUpdate();
+            authorStatement = connection.prepareStatement("INSERT INTO Author (addedBy, name, dateofbirth) VALUES(?, ?, ?)", authorStatement.RETURN_GENERATED_KEYS);
+            authorStatement.setString(1, book.getUser().getUsername());
+            authorStatement.setString(2, book.getAuthors().get(0).getAuthorName());
+            authorStatement.setDate(3, Date.valueOf(String.valueOf(book.getAuthors().get(0).getDateOfBirth())));
+            authorStatement.executeUpdate();
 
-            ResultSet rs = statement.getGeneratedKeys();
+            ResultSet rs = authorStatement.getGeneratedKeys();
             if (rs.next()) {
                 book.getAuthors().get(0).setAuthorId(rs.getInt(1));
             }
+            authorStatement.clearParameters();
 
-            statement = connection.prepareStatement("INSERT INTO BookAuthor VALUES(?, ?)");
-            statement.setInt(1, book.getAuthors().get(0).getAuthorID());
-            statement.setString(2, book.getIsbn());
-            statement.executeUpdate();
+            bookAuthorStatement = connection.prepareStatement("INSERT INTO BookAuthor VALUES(?, ?)");
+            bookAuthorStatement.setInt(1, book.getAuthors().get(0).getAuthorID());
+            bookAuthorStatement.setString(2, book.getIsbn());
+            bookAuthorStatement.executeUpdate();
+            bookAuthorStatement.clearParameters();
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -121,9 +129,12 @@ public class BooksDbImpl implements BooksDbInterface {
         } finally {
             try {
                 connection.setAutoCommit(true);
-                statement.close();
-            } catch (SQLException e) {
-                throw new BooksDbException(e.getSQLState());
+                bookStatement.close();
+                genreStatement.close();
+                authorStatement.close();
+                bookAuthorStatement.close();
+            } catch (SQLException | NullPointerException e) {
+                throw new BooksDbException(e.getLocalizedMessage());
             }
         }
     }
@@ -141,28 +152,30 @@ public class BooksDbImpl implements BooksDbInterface {
         if (author == null) {
             throw new BooksDbException("");
         }
-        PreparedStatement statement = null;
+        PreparedStatement authorStatement = null;
+        PreparedStatement bookAuthorStatement = null;
         try {
             connection.setAutoCommit(false);
             author.setUser(currentUser);
-            statement = connection.prepareStatement("INSERT INTO Author(addedBy, Name, dateOfBirth) VALUES(?, ?, ?)", statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, author.getUser().getUsername());
-            statement.setString(2, author.getAuthorName());
-            statement.setString(3, String.valueOf(author.getDateOfBirth()));
-            statement.executeUpdate();
 
-            ResultSet rs = statement.getGeneratedKeys();
+            authorStatement = connection.prepareStatement("INSERT INTO Author(addedBy, Name, dateOfBirth) VALUES(?, ?, ?)", authorStatement.RETURN_GENERATED_KEYS);
+            authorStatement.setString(1, author.getUser().getUsername());
+            authorStatement.setString(2, author.getAuthorName());
+            authorStatement.setString(3, String.valueOf(author.getDateOfBirth()));
+            authorStatement.executeUpdate();
+
+            ResultSet rs = authorStatement.getGeneratedKeys();
             int key = -1;
             if (rs.next()) {
                 key = rs.getInt(1);
             }
+            authorStatement.clearParameters();
 
-            statement = connection.prepareStatement("INSERT INTO BookAuthor(authorId, isbn) VALUES(?, ?)");
-            statement.setInt(1, key);
-            statement.setString(2, Isbn);
-            statement.executeUpdate();
-
-            statement = connection.prepareStatement("SELECT CURRENT_USER()");
+            bookAuthorStatement = connection.prepareStatement("INSERT INTO BookAuthor(authorId, isbn) VALUES(?, ?)");
+            bookAuthorStatement.setInt(1, key);
+            bookAuthorStatement.setString(2, Isbn);
+            bookAuthorStatement.executeUpdate();
+            bookAuthorStatement.clearParameters();
 
             connection.commit();
         } catch (SQLException e) {
@@ -171,35 +184,37 @@ public class BooksDbImpl implements BooksDbInterface {
         } finally {
             try {
                 connection.setAutoCommit(true);
-                statement.close();
-            } catch (SQLException e) {
-                throw new BooksDbException(e.getSQLState());
+                authorStatement.close();
+                bookAuthorStatement.close();
+            } catch (SQLException | NullPointerException e) {
+                throw new BooksDbException(e.getLocalizedMessage());
             }
         }
     }
 
     /**
      * @param review The review object of the book
-     * @param isbn   This is the ISBN of the book
+     * @param isbn This is the ISBN of the book
      * @throws BooksDbException if a review is not added successfully, a BooksDbException is thrown
-     * @throws SQLException     Throws a SQLException if error occurs
+     * @throws SQLException Throws a SQLException if error occurs
      */
     @Override
     public void addReview(Review review, String isbn) throws BooksDbException, SQLException {
         if(review == null) {
             throw new BooksDbException("");
         }
-        PreparedStatement statement = null;
+        PreparedStatement ratingStatement = null;
         try {
             connection.setAutoCommit(false);
             review.setUser(currentUser);
-            statement = connection.prepareStatement("INSERT INTO Rating VALUES(?, ?, ?, ?, ?)");
-            statement.setString(1, isbn);
-            statement.setString(2, review.getUser().getUsername());
-            statement.setString(3, Integer.toString(review.getRating()));
-            statement.setString(4, review.getStoryLine());
-            statement.setDate(5, Date.valueOf(String.valueOf(review.getReviewDate())));
-            statement.executeUpdate();
+            ratingStatement = connection.prepareStatement("INSERT INTO Rating VALUES(?, ?, ?, ?, ?)");
+            ratingStatement.setString(1, isbn);
+            ratingStatement.setString(2, review.getUser().getUsername());
+            ratingStatement.setString(3, Integer.toString(review.getRating()));
+            ratingStatement.setString(4, review.getStoryLine());
+            ratingStatement.setDate(5, Date.valueOf(String.valueOf(review.getReviewDate())));
+            ratingStatement.executeUpdate();
+            ratingStatement.clearParameters();
 
             connection.commit();
         } catch (SQLException e) {
@@ -208,9 +223,9 @@ public class BooksDbImpl implements BooksDbInterface {
         } finally {
             try {
                 connection.setAutoCommit(true);
-                statement.close();
-            } catch (SQLException e) {
-                throw new BooksDbException(e.getSQLState());
+                ratingStatement.close();
+            } catch (SQLException | NullPointerException e) {
+                throw new BooksDbException(e.getLocalizedMessage());
             }
         }
     }
@@ -224,33 +239,44 @@ public class BooksDbImpl implements BooksDbInterface {
      */
     @Override
     public void removeBook(String isbn) throws BooksDbException, SQLException {
-        PreparedStatement statement = null;
+        PreparedStatement ratingStatement = null;
+        PreparedStatement bookStatement = null;
+        PreparedStatement genreStatement = null;
+        PreparedStatement bookAuthorStatement = null;
+        PreparedStatement authorStatement = null;
         ResultSet rs = null;
         try {
             connection.setAutoCommit(false);
-            statement = connection.prepareStatement("DELETE FROM Rating WHERE isbn = " + isbn);
-            statement.executeUpdate();
+            ratingStatement = connection.prepareStatement("DELETE FROM Rating WHERE isbn = " + isbn);
+            ratingStatement.executeUpdate();
+            ratingStatement.clearParameters();
 
-            statement = connection.prepareStatement("DELETE FROM Genre WHERE isbn = " + isbn);
-            statement.executeUpdate();
+            genreStatement = connection.prepareStatement("DELETE FROM Genre WHERE isbn = " + isbn);
+            genreStatement.executeUpdate();
+            genreStatement.clearParameters();
 
-            statement = connection.prepareStatement("SELECT * FROM BookAuthor WHERE isbn = " + isbn);
-            rs = statement.executeQuery();
+            bookAuthorStatement = connection.prepareStatement("SELECT * FROM BookAuthor WHERE isbn = " + isbn);
+            rs = bookAuthorStatement.executeQuery();
+            bookAuthorStatement.clearParameters();
+
             ArrayList<Integer> tmpAuthorID = new ArrayList<>();
             while (rs.next()) {
                 tmpAuthorID.add(rs.getInt("AuthorID"));
             }
 
-            statement = connection.prepareStatement("DELETE FROM BookAuthor WHERE isbn = " + isbn);
-            statement.executeUpdate();
+            bookAuthorStatement = connection.prepareStatement("DELETE FROM BookAuthor WHERE isbn = " + isbn);
+            bookAuthorStatement.executeUpdate();
+            bookAuthorStatement.clearParameters();
 
             for (int i = 0; i < tmpAuthorID.size(); i++) {
-                statement = connection.prepareStatement("DELETE FROM Author WHERE authorId = " + tmpAuthorID.get(i));
-                statement.executeUpdate();
+                authorStatement = connection.prepareStatement("DELETE FROM Author WHERE authorId = " + tmpAuthorID.get(i));
+                authorStatement.executeUpdate();
             }
+            authorStatement.clearParameters();
 
-            statement = connection.prepareStatement("DELETE FROM Book WHERE isbn = " + isbn);
-            statement.executeUpdate();
+            bookStatement = connection.prepareStatement("DELETE FROM Book WHERE isbn = " + isbn);
+            bookStatement.executeUpdate();
+            bookStatement.clearParameters();
 
             connection.commit();
         } catch (SQLException e) {
@@ -259,9 +285,13 @@ public class BooksDbImpl implements BooksDbInterface {
         } finally {
             try {
                 connection.setAutoCommit(true);
-                statement.close();
-            } catch (SQLException e) {
-                throw new BooksDbException(e.getSQLState());
+                ratingStatement.close();
+                bookStatement.close();
+                genreStatement.close();
+                bookAuthorStatement.close();
+                authorStatement.close();
+            } catch (SQLException | NullPointerException e) {
+                throw new BooksDbException(e.getLocalizedMessage());
             }
         }
     }
@@ -277,22 +307,23 @@ public class BooksDbImpl implements BooksDbInterface {
     @Override
     public List<Book> searchBooksByTitle(String searchTitle) throws BooksDbException {
         List<Book> result = new ArrayList<>();
-        PreparedStatement statement = null;
+        PreparedStatement bookStatement = null;
         ResultSet rs = null;
         try {
-            statement = connection.prepareStatement("SELECT * FROM Book " +
+            bookStatement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "WHERE title LIKE '%" + searchTitle + "%'");
-            rs = statement.executeQuery();
+            rs = bookStatement.executeQuery();
 
-            result = getAuthorsAndUsersFromSearch(result, rs, statement);
+            result = getAuthorsAndUsersFromSearch(result, rs, bookStatement);
+            bookStatement.clearParameters();
             return result;
         } catch (SQLException e) {
             throw new BooksDbException(e.getSQLState());
         } finally {
             try {
-                statement.close();
+                bookStatement.close();
                 rs.close();
             } catch (SQLException | NullPointerException e) {
                 throw new BooksDbException("Not logged in");
@@ -311,21 +342,22 @@ public class BooksDbImpl implements BooksDbInterface {
     public List<Book> searchBooksByIsbn(String searchISBN) throws BooksDbException {
         List<Book> result = new ArrayList<>();
         ResultSet rs = null;
-        PreparedStatement statement = null;
+        PreparedStatement bookStatement = null;
         try {
-            statement = connection.prepareStatement("SELECT * FROM Book " +
+            bookStatement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "WHERE Book.isbn LIKE '%" + searchISBN + "%'");
-            rs = statement.executeQuery();
+            rs = bookStatement.executeQuery();
 
-            result = getAuthorsAndUsersFromSearch(result, rs, statement);
+            result = getAuthorsAndUsersFromSearch(result, rs, bookStatement);
+            bookStatement.clearParameters();
             return result;
         } catch (SQLException e) {
             throw new BooksDbException(e.getSQLState());
         } finally {
             try {
-                statement.close();
+                bookStatement.close();
                 rs.close();
             } catch (SQLException | NullPointerException e) {
                 throw new BooksDbException("Not logged in");
@@ -343,25 +375,29 @@ public class BooksDbImpl implements BooksDbInterface {
     public List<Book> searchBooksByAuthor(String searchAuthor) throws BooksDbException {
         List<Book> result = new ArrayList<>();
         ResultSet rs = null;
-        PreparedStatement statement = null;
+        PreparedStatement authorStatement = null;
+        PreparedStatement bookStatement = null;
+        PreparedStatement bookAuthorStatement = null;
+        PreparedStatement ratingStatement = null;
         try {
-            statement = connection.prepareStatement("SELECT * FROM Author " +
+            authorStatement = connection.prepareStatement("SELECT * FROM Author " +
                     "join BookAuthor ON (Author.authorId = BookAuthor.authorId)" +
                     "WHERE Author.Name LIKE '%" + searchAuthor + "%'");
-            rs = statement.executeQuery();
+            rs = authorStatement.executeQuery();
+            authorStatement.clearParameters();
 
             List<String> tmpID1 = new ArrayList<>();
-
             while (rs.next()) {
                 tmpID1.add(rs.getString("ISBN"));
             }
 
             for (int i = 0; i < tmpID1.size(); i++) {
-                statement = connection.prepareStatement("SELECT * FROM Book " +
+                bookStatement = connection.prepareStatement("SELECT * FROM Book " +
                         "join Genre ON (Book.isbn = Genre.isbn)" +
                         "join Rating ON (Book.isbn = Rating.isbn)" +
                         "WHERE Book.isbn LIKE '%" + tmpID1.get(i) + "%'");
-                rs = statement.executeQuery();
+                rs = bookStatement.executeQuery();
+                bookStatement.clearParameters();
                 while (rs.next()) {
                     Book book = new Book(
                             rs.getString("ISBN"),
@@ -372,22 +408,25 @@ public class BooksDbImpl implements BooksDbInterface {
                     result.add(book);
                 }
             }
-            statement.clearParameters();
+
             for (int i = 0; i < result.size(); i++) {
-                statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
+                bookAuthorStatement = connection.prepareStatement("SELECT * FROM BookAuthor " +
                         "WHERE isbn = " +
                         result.get(i).getIsbn());
-                rs = statement.executeQuery();
+                rs = bookAuthorStatement.executeQuery();
+                bookAuthorStatement.clearParameters();
+
                 ArrayList<Integer> tmpID = new ArrayList<>();
                 while (rs.next()) {
                     tmpID.add(rs.getInt("AuthorID"));
                 }
-                statement.clearParameters();
 
                 for (int j = 0; j < tmpID.size(); j++) {
-                    statement = connection.prepareStatement("SELECT * FROM Author " +
+                    authorStatement = connection.prepareStatement("SELECT * FROM Author " +
                             "WHERE authorId = " + tmpID.get(j));
-                    rs = statement.executeQuery();
+                    rs = authorStatement.executeQuery();
+                    authorStatement.clearParameters();
+
                     while (rs.next()) {
                         Author author = new Author(
                                 rs.getString("Name"),
@@ -396,13 +435,13 @@ public class BooksDbImpl implements BooksDbInterface {
                                 rs.getString("addedBy"));
                         result.get(i).addAuthor(author);
                     }
-                    statement.clearParameters();
-
-
                 }
-                statement = connection.prepareStatement("SELECT * FROM Rating " +
+
+                ratingStatement = connection.prepareStatement("SELECT * FROM Rating " +
                         "WHERE isbn = " + result.get(i).getIsbn());
-                rs = statement.executeQuery();
+                rs = ratingStatement.executeQuery();
+                ratingStatement.clearParameters();
+
                 while (rs.next()) {
                     Review review = new Review(
                             rs.getInt("Rating"),
@@ -417,7 +456,10 @@ public class BooksDbImpl implements BooksDbInterface {
             throw new BooksDbException(e.getSQLState());
         } finally {
             try {
-                statement.close();
+                authorStatement.close();
+                bookStatement.close();
+                bookAuthorStatement.close();
+                ratingStatement.close();
                 rs.close();
             } catch (SQLException | NullPointerException e) {
                 throw new BooksDbException("Not logged in");
@@ -435,22 +477,22 @@ public class BooksDbImpl implements BooksDbInterface {
     public List<Book> searchBooksByRating ( int searchRating) throws BooksDbException {
         List<Book> result = new ArrayList<>();
         ResultSet rs = null;
-        PreparedStatement statement = null;
+        PreparedStatement bookStatement = null;
         try {
 
-            statement = connection.prepareStatement("SELECT * FROM Book " +
+            bookStatement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "WHERE Rating.rating LIKE '%" + searchRating + "%'");
-            rs = statement.executeQuery();
-            result = getAuthorsAndUsersFromSearch(result, rs, statement);
-
+            rs = bookStatement.executeQuery();
+            result = getAuthorsAndUsersFromSearch(result, rs, bookStatement);
+            bookStatement.clearParameters();
             return result;
         } catch (SQLException e) {
             throw new BooksDbException(e.getSQLState());
         } finally {
             try {
-                statement.close();
+                bookStatement.close();
                 rs.close();
             } catch (SQLException | NullPointerException e) {
                 throw new BooksDbException("Not logged in");
@@ -468,21 +510,21 @@ public class BooksDbImpl implements BooksDbInterface {
     public List<Book> searchBooksByGenre (String searchGenre) throws BooksDbException {
         List<Book> result = new ArrayList<>();
         ResultSet rs = null;
-        PreparedStatement statement = null;
+        PreparedStatement bookStatement = null;
         try {
-            statement = connection.prepareStatement("SELECT * FROM Book " +
+            bookStatement = connection.prepareStatement("SELECT * FROM Book " +
                     "join Genre ON (Book.isbn = Genre.isbn)" +
                     "join Rating ON (Book.isbn = Rating.isbn)" +
                     "WHERE genre LIKE '%" + searchGenre + "%'");
-            rs = statement.executeQuery();
-
-            result = getAuthorsAndUsersFromSearch(result, rs, statement);
+            rs = bookStatement.executeQuery();
+            result = getAuthorsAndUsersFromSearch(result, rs, bookStatement);
+            bookStatement.clearParameters();
             return result;
         } catch (SQLException e) {
             throw new BooksDbException(e.getSQLState());
         } finally {
             try {
-                statement.close();
+                bookStatement.close();
                 rs.close();
             } catch (SQLException | NullPointerException e) {
                 throw new BooksDbException("Not logged in");
@@ -491,6 +533,9 @@ public class BooksDbImpl implements BooksDbInterface {
     }
 
     private List<Book> getAuthorsAndUsersFromSearch(List<Book> result, ResultSet rs, PreparedStatement statement) throws BooksDbException {
+        PreparedStatement bookAuthorStatement = null;
+        PreparedStatement authorStatement = null;
+        PreparedStatement ratingStatement = null;
         try {
             while (rs.next()) {
                 Book book = new Book(
@@ -501,22 +546,24 @@ public class BooksDbImpl implements BooksDbInterface {
                         rs.getString("addedBy"));
                 result.add(book);
             }
-            statement.clearParameters();
+
             for (int i = 0; i < result.size(); i++) {
-                statement = connection.prepareStatement("SELECT * FROM BookAuthor " +
+                bookAuthorStatement = connection.prepareStatement("SELECT * FROM BookAuthor " +
                         "WHERE isbn = " +
                         result.get(i).getIsbn());
-                rs = statement.executeQuery();
+                rs = bookAuthorStatement.executeQuery();
+                bookAuthorStatement.clearParameters();
                 ArrayList<Integer> tmpID = new ArrayList<Integer>();
                 while (rs.next()) {
                     tmpID.add(rs.getInt("AuthorID"));
                 }
-                statement.clearParameters();
 
                 for (int j = 0; j < tmpID.size(); j++) {
-                    statement = connection.prepareStatement("SELECT * FROM Author " +
+                    authorStatement = connection.prepareStatement("SELECT * FROM Author " +
                             "WHERE authorId = " + tmpID.get(j));
-                    rs = statement.executeQuery();
+                    rs = authorStatement.executeQuery();
+                    authorStatement.clearParameters();
+
                     while (rs.next()) {
                         Author author = new Author(
                                 rs.getString("Name"),
@@ -525,11 +572,12 @@ public class BooksDbImpl implements BooksDbInterface {
                                 rs.getString("addedBy"));
                         result.get(i).addAuthor(author);
                     }
-                    statement.clearParameters();
                 }
-                statement = connection.prepareStatement("SELECT * FROM Rating " +
+
+                ratingStatement = connection.prepareStatement("SELECT * FROM Rating " +
                         "WHERE isbn = " + result.get(i).getIsbn());
-                rs = statement.executeQuery();
+                rs = ratingStatement.executeQuery();
+                ratingStatement.clearParameters();
                 while (rs.next()) {
                     Review review = new Review(
                             rs.getInt("Rating"),
@@ -542,6 +590,15 @@ public class BooksDbImpl implements BooksDbInterface {
             return result;
         } catch(SQLException e){
             throw new BooksDbException();
+        } finally {
+            try {
+                bookAuthorStatement.close();
+                authorStatement.close();
+                ratingStatement.close();
+                rs.close();
+            } catch (SQLException | NullPointerException e) {
+                throw new BooksDbException("Couldn't find any matches");
+            }
         }
     }
 }
